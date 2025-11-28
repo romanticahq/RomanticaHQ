@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: romanticahq_db
+    environment:
+      POSTGRES_USER: romantica
+      POSTGRES_PASSWORD: romantica_pass
+      POSTGRES_DB: romanticahq
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - romantica_net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: romanticahq_backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/romanticahq
+      SPRING_DATASOURCE_USERNAME: romantica
+      SPRING_DATASOURCE_PASSWORD: romantica_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    networks:
+      - romantica_net
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: romanticahq_frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: "https://romanticahq.com"
+    ports:
+      - "3000:3000"
+    networks:
+      - romantica_net
+
+networks:
+  romantica_net:
+
+volumes:
+  db_data:
