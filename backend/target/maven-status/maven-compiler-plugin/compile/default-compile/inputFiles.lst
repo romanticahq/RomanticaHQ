@@ -1,0 +1,11 @@
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/api/HealthController.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/RomanticaHqBackendApplication.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/service/UserService.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/service/UserServiceImpl.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/controller/UserController.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/repository/UserRepository.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/dto/UserRegistrationRequest.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/dto/LoginRequest.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/dto/ResendVerificationRequest.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/config/WebSecurityConfig.java
+/Users/Mac/Downloads/RomanticaHQ/backend/src/main/java/com/romanticahq/backend/user/entity/User.java

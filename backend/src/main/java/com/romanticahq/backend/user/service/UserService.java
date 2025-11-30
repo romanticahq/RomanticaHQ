@@ -2,11 +2,18 @@ package com.romanticahq.backend.user.service;
 
 import com.romanticahq.backend.user.dto.LoginRequest;
 import com.romanticahq.backend.user.dto.UserRegistrationRequest;
-import com.romanticahq.backend.user.entity.User;
 
 public interface UserService {
 
-    User register(UserRegistrationRequest request);
+    // create a new user account
+    void register(UserRegistrationRequest request);
 
-    User login(LoginRequest request);
+    // login and return something the controller/frontend can use
+    String login(LoginRequest request);
+
+    // email verification
+    void verifyEmail(String token);
+
+    // resend verification link
+    void resendVerification(String email);
 }
