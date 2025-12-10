@@ -1,142 +1,173 @@
-// frontend/app/auth/verify/page.tsx
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+export const dynamic = 'force-dynamic';
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-export default function VerifyEmailPage() {
+export default function VerifyPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [message, setMessage] = useState<string>("Verifying your email…");
+  const token = searchParams.get('token');
+
+  const [status, setStatus] = useState('idle');
 
   useEffect(() => {
-    const token = searchParams.get("token");
-
     if (!token) {
-      setStatus("error");
-      setMessage("Missing verification token. Please use the link we sent you.");
+      setStatus('error');
       return;
     }
 
-    const verify = async () => {
-      try {
-        setStatus("loading");
-        setMessage("Verifying your email…");
+    setStatus('loading');
 
-        const res = await fetch(
-          `${API_BASE}/api/auth/verify?token=${encodeURIComponent(token)}`,
-          {
-            method: "GET",
-          }
-        );
+    // Use your backend base URL (env var recommended)
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
-        if (res.ok) {
-          const text = await res.text();
-          setStatus("success");
-          setMessage(
-            text || "Your email is verified. You can now log in to RomanticaHQ."
-          );
-        } else {
-          const text = await res.text();
-          setStatus("error");
-          setMessage(text || "We couldn’t verify this link. It may be expired.");
-        }
-      } catch (err) {
-        console.error(err);
-        setStatus("error");
-        setMessage("Something went wrong while verifying. Please try again.");
-      }
-    };
-
-    verify();
-  }, [searchParams]);
-
-  const goToLogin = () => {
-    router.push("/auth/login");
-  };
+    fetch(`${baseUrl}/auth/verify?token=${encodeURIComponent(token)}`, {
+      method: 'POST',
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Verify failed');
+        setStatus('success');
+      })
+      .catch(() => setStatus('error'));
+  }, [token]);
 
   return (
-    <div
+    <main
       style={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, rgba(251,113,133,0.16), transparent 55%), radial-gradient(circle at bottom, rgba(129,140,248,0.16), transparent 55%), #020617",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem 1.5rem",
-        color: "white",
-        fontFamily:
-          'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+        minHeight: '100vh',
+        backgroundColor: '#020617',
+        color: '#e5e7eb',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem 1.5rem',
       }}
     >
       <div
         style={{
           maxWidth: 420,
-          width: "100%",
+          width: '100%',
+          backgroundColor: '#020617',
           borderRadius: 24,
-          padding: "1.75rem 1.5rem",
-          background:
-            "linear-gradient(145deg, rgba(30,64,175,0.9), rgba(236,72,153,0.85))",
-          boxShadow: "0 30px 60px rgba(15,23,42,0.75)",
+          border: '1px solid rgba(148,163,184,0.35)',
+          padding: '1.75rem 1.5rem',
+          boxShadow: '0 24px 60px rgba(15,23,42,0.8)',
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 999,
-              backgroundColor: "rgba(15,23,42,0.9)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 20,
-            }}
-          >
-            {status === "success" ? "✅" : status === "error" ? "⚠️" : "📩"}
-          </div>
-          <h1 style={{ fontSize: 20, margin: 0 }}>Verify your email</h1>
-        </div>
-
-        <p
+        <h1
           style={{
-            marginTop: 16,
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: "rgba(249,250,251,0.9)",
+            fontSize: 22,
+            marginBottom: 12,
+            color: '#f9fafb',
           }}
         >
-          {message}
-        </p>
+          Verify your email
+        </h1>
 
-        {status === "success" && (
-          <button
-            onClick={goToLogin}
-            style={{
-              marginTop: 20,
-              width: "100%",
-              padding: "0.8rem 1rem",
-              borderRadius: 999,
-              border: "none",
-              cursor: "pointer",
-              background:
-                "linear-gradient(135deg, #f97316, #db2777, #6366f1)",
-              color: "white",
-              fontWeight: 600,
-              fontSize: 14,
-            }}
-          >
-            Go to login
-          </button>
+        {status === 'idle' || status === 'loading' ? (
+          <>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#9ca3af',
+                marginBottom: 16,
+              }}
+            >
+              We&apos;re confirming your email so you can start using
+              RomanticaHQ.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#e5e7eb',
+              }}
+            >
+              Please wait a moment…
+            </p>
+          </>
+        ) : null}
+
+        {status === 'success' && (
+          <>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#bbf7d0',
+                marginBottom: 8,
+              }}
+            >
+              ✅ Your email has been verified.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#e5e7eb',
+                marginBottom: 16,
+              }}
+            >
+              You can now log in to your account.
+            </p>
+            <a
+              href="/auth/login"
+              style={{
+                display: 'inline-block',
+                padding: '0.7rem 1.4rem',
+                borderRadius: 999,
+                background:
+                  'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
+                color: 'white',
+                fontWeight: 600,
+                fontSize: 14,
+                textDecoration: 'none',
+              }}
+            >
+              Go to login
+            </a>
+          </>
+        )}
+
+        {status === 'error' && (
+          <>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#fecaca',
+                marginBottom: 8,
+              }}
+            >
+              ⚠️ We couldn&apos;t verify this link.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#e5e7eb',
+                marginBottom: 16,
+              }}
+            >
+              Your verification link may be expired or invalid. Try requesting a
+              new email from the login page.
+            </p>
+            <a
+              href="/auth/login"
+              style={{
+                display: 'inline-block',
+                padding: '0.7rem 1.4rem',
+                borderRadius: 999,
+                border: '1px solid rgba(148,163,184,0.8)',
+                color: '#e5e7eb',
+                fontWeight: 500,
+                fontSize: 14,
+                textDecoration: 'none',
+                backgroundColor: 'rgba(15,23,42,0.9)',
+              }}
+            >
+              Back to login
+            </a>
+          </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
