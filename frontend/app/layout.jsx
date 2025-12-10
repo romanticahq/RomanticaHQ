@@ -22,6 +22,7 @@ export default function RootLayout({ children }) {
             flexDirection: 'column',
           }}
         >
+          {/* HEADER */}
           <header
             style={{
               width: '100%',
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
                 justifyContent: 'space-between',
               }}
             >
+              {/* LOGO */}
               <a
                 href="/"
                 style={{
@@ -81,6 +83,7 @@ export default function RootLayout({ children }) {
                 </span>
               </a>
 
+              {/* NAV */}
               <nav
                 style={{
                   display: 'flex',
@@ -98,6 +101,7 @@ export default function RootLayout({ children }) {
                 >
                   Log in
                 </a>
+
                 <a
                   href="/auth/signup"
                   style={{
@@ -117,8 +121,10 @@ export default function RootLayout({ children }) {
             </div>
           </header>
 
+          {/* MAIN CONTENT */}
           <main style={{ flex: 1 }}>{children}</main>
 
+          {/* FOOTER */}
           <footer
             style={{
               borderTop: '1px solid rgba(148,163,184,0.25)',
@@ -140,15 +146,19 @@ export default function RootLayout({ children }) {
                 fontSize: 12,
               }}
             >
-              <span>© {new Date().getFullYear()} RomanticaHQ. All rights reserved.</span>
+              <span>
+                © {new Date().getFullYear()} RomanticaHQ. All rights reserved.
+              </span>
+
+              {/* FIXED FOOTER LINKS */}
               <div style={{ display: 'flex', gap: 12 }}>
-                <a href="#" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                <a href="/terms" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Terms
                 </a>
-                <a href="#" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                <a href="/privacy" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Privacy
                 </a>
-                <a href="#" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                <a href="/safety" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Safety
                 </a>
               </div>
