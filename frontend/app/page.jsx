@@ -36,9 +36,9 @@ export default function HomePage() {
           Have you tried online dating before?
         </p>
         <div className="landing-links" aria-label="Onboarding shortcuts">
-          <a href="#new">I&apos;m new to it</a>
-          <a href="#once">Once or twice</a>
-          <a href="#pro">I&apos;m an online dating pro</a>
+          <Link href="/auth/signup?starter=new">I&apos;m new to it</Link>
+          <Link href="/auth/signup?starter=once">Once or twice</Link>
+          <Link href="/auth/signup?starter=pro">I&apos;m an online dating pro</Link>
         </div>
       </div>
     </section>
