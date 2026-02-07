@@ -1,294 +1,144 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
 export default function SignupPage() {
-  const [form, setForm] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    gender: '',
-    birthday: '',
-  });
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const [busy, setBusy] = useState(false);
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setLoading(true);
+    setStatus(null);
 
-  const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-
-    const payload = {
-      fullName: form.fullName,
-      email: form.email,
-      password: form.password,
-      gender: form.gender,
-      birthday: form.birthday,
-    };
+    const formData = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/register`, {
+      const res = await fetch(`${apiBase}/api/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      const data = await res.json();
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Signup failed');
+        throw new Error(data.error || 'Sign up failed.');
       }
 
-      alert('Account created! You can now log in.');
-      window.location.href = '/auth/login';
+      setStatus({ type: 'success', message: data.message });
+      event.currentTarget.reset();
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      setStatus({ type: 'error', message: err.message });
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div
-      style={{
-        minHeight: 'calc(100vh - 64px)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(236,72,153,0.16), transparent 55%), #020617',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 960,
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 2fr)',
-          gap: 32,
-          alignItems: 'center',
-        }}
-      >
-        {/* LEFT copy */}
-        <section
-          style={{
-            color: '#e5e7eb',
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 32,
-              marginBottom: 12,
-              color: 'white',
-            }}
-          >
-            Create your RomanticaHQ account
-          </h1>
-          <p
-            style={{
-              marginBottom: 20,
-              color: '#9ca3af',
-              fontSize: 14,
-              maxWidth: 420,
-            }}
-          >
+    <section className="auth-hero auth-hero--gradient">
+      <div className="auth-hero-inner">
+        <div className="auth-hero-copy">
+          <h1>Create your RomanticaHQ account</h1>
+          <p>
             Tell us a few basics so we can start matching you with real people
             who are also looking for honest connection.
           </p>
-
-          <ul
-            style={{
-              listStyle: 'none',
-              padding: 0,
-              margin: 0,
-              display: 'grid',
-              gap: 10,
-              maxWidth: 380,
-              fontSize: 13,
-            }}
-          >
-            <li>💗 Free to join. No payment required to start.</li>
-            <li>🛡️ You stay in control of your data and privacy.</li>
-            <li>🚫 Zero tolerance for harassment or abuse.</li>
+          <ul className="auth-hero-points">
+            <li>
+              <span aria-hidden="true">💗</span>
+              <span>Free to join. No payment required to start.</span>
+            </li>
+            <li>
+              <span aria-hidden="true">🛡️</span>
+              <span>You stay in control of your data and privacy.</span>
+            </li>
+            <li>
+              <span aria-hidden="true">🚫</span>
+              <span>Zero tolerance for harassment or abuse.</span>
+            </li>
           </ul>
-        </section>
+        </div>
 
-        {/* RIGHT form */}
-        <section>
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: 24,
-              padding: '1.75rem',
-              boxShadow: '0 24px 50px rgba(15,23,42,0.45)',
-            }}
-          >
-            <div style={{ marginBottom: 18 }}>
-              <h2
-                style={{
-                  fontSize: 20,
-                  margin: 0,
-                  marginBottom: 4,
-                }}
-              >
-                Join for free
-              </h2>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: '#6b7280',
-                  margin: 0,
-                }}
-              >
-                This takes less than 60 seconds. You can complete your profile later.
-              </p>
-            </div>
+        <div className="auth-card">
+          <h2>Join</h2>
 
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Full name</span>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <label className="form-field">
+              Full name
               <input
                 type="text"
                 name="fullName"
-                value={form.fullName}
-                onChange={handleChange}
+                autoComplete="name"
                 required
-                style={fieldStyle}
               />
             </label>
 
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Email</span>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                style={fieldStyle}
-              />
+            <label className="form-field">
+              Email
+              <input type="email" name="email" autoComplete="email" required />
             </label>
 
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Password</span>
+            <label className="form-field">
+              Password
               <input
                 type="password"
                 name="password"
-                value={form.password}
-                onChange={handleChange}
+                autoComplete="new-password"
                 required
-                minLength={6}
-                style={fieldStyle}
               />
             </label>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.1fr 0.9fr',
-                gap: 12,
-                marginBottom: 12,
-              }}
-            >
-              <label style={{ display: 'block' }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>Birthday</span>
-                <input
-                  type="date"
-                  name="birthday"
-                  value={form.birthday}
-                  onChange={handleChange}
-                  required
-                  style={fieldStyle}
-                />
+            <div className="auth-row-2">
+              <label className="form-field" style={{ margin: 0 }}>
+                Birthday
+                <input type="date" name="birthday" required />
               </label>
 
-              <label style={{ display: 'block' }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>Gender</span>
-                <select
-                  name="gender"
-                  value={form.gender}
-                  onChange={handleChange}
-                  required
-                  style={fieldStyle}
-                >
-                  <option value="">Select</option>
-                  <option value="MAN">Man</option>
-                  <option value="WOMAN">Woman</option>
-                  <option value="NON_BINARY">Non-binary</option>
-                  <option value="OTHER">Other</option>
+              <label className="form-field" style={{ margin: 0 }}>
+                Gender
+                <select name="gender" defaultValue="female" required>
+                  <option value="female">Woman</option>
+                  <option value="male">Man</option>
+                  <option value="nonbinary">Non-binary</option>
+                  <option value="other">Other</option>
                 </select>
               </label>
             </div>
 
-            <button
-              type="submit"
-              disabled={busy}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                borderRadius: 999,
-                border: 'none',
-                background:
-                  'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-                color: 'white',
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: busy ? 'default' : 'pointer',
-                opacity: busy ? 0.8 : 1,
-                marginTop: 4,
-              }}
-            >
-              {busy ? 'Creating your account…' : 'Create account'}
+            <button type="submit" className="button button-primary" disabled={loading}>
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
-
-            <p
-              style={{
-                marginTop: 12,
-                fontSize: 12,
-                color: '#6b7280',
-              }}
-            >
-              By signing up you confirm you&apos;re at least 18 and agree to our
-              Terms & Privacy Policy.
-            </p>
-
-            <p
-              style={{
-                marginTop: 8,
-                fontSize: 13,
-                color: '#4b5563',
-              }}
-            >
-              Already on RomanticaHQ?{' '}
-              <a
-                href="/auth/login"
-                style={{ color: '#111827', fontWeight: 600 }}
-              >
-                Log in instead
-              </a>
-              .
-            </p>
           </form>
-        </section>
+
+          {status ? (
+            <p
+              className="form-footnote"
+              style={{
+                marginTop: 16,
+                color: status.type === 'error' ? '#b91c1c' : '#047857',
+              }}
+            >
+              {status.message}
+            </p>
+          ) : null}
+
+          <p className="form-footnote" style={{ marginTop: 16 }}>
+            By signing up you confirm you&apos;re at least 18 and agree to our
+            Terms &amp; Privacy Policy.
+          </p>
+          <p className="form-footnote" style={{ marginTop: 12 }}>
+            Already on RomanticaHQ?{' '}
+            <Link href="/auth/login" className="form-link">
+              Log in instead
+            </Link>
+            .
+          </p>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
-
-const fieldStyle = {
-  width: '100%',
-  marginTop: 4,
-  padding: '0.55rem 0.75rem',
-  borderRadius: 12,
-  border: '1px solid #e5e7eb',
-  fontSize: 13,
-  outline: 'none',
-};

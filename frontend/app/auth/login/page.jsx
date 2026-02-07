@@ -1,180 +1,114 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [busy, setBusy] = useState(false);
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setBusy(true);
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setLoading(true);
+    setStatus(null);
+
+    const formData = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(formData.entries());
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/login`, {
+      const res = await fetch(`${apiBase}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Login failed');
+        throw new Error(data.error || 'Login failed.');
       }
 
-      const data = await res.json();
-      alert(`Welcome back, ${data.fullName || data.email}!`);
+      if (data.accessToken) {
+        localStorage.setItem('romantica_token', data.accessToken);
+      }
+
+      setStatus({ type: 'success', message: data.message });
+      event.currentTarget.reset();
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      setStatus({ type: 'error', message: err.message });
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div
-      style={{
-        minHeight: 'calc(100vh - 64px)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(96,165,250,0.16), transparent 55%), #020617',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 840,
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 3fr)',
-          gap: 32,
-          alignItems: 'center',
-        }}
-      >
-        {/* LEFT: short copy */}
-        <section
-          style={{
-            color: '#e5e7eb',
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 30,
-              marginBottom: 10,
-              color: 'white',
-            }}
-          >
-            Welcome back to RomanticaHQ
-          </h1>
-          <p
-            style={{
-              fontSize: 14,
-              color: '#9ca3af',
-              maxWidth: 380,
-            }}
-          >
-            Continue your conversations, see who liked you, and keep building
-            connections that actually feel good.
-          </p>
-        </section>
+    <section className="auth-hero auth-hero--image">
+      <div className="auth-hero-inner">
+        <div className="auth-hero-copy">
+          <h1>Welcome back.</h1>
+          <p>Log in to continue your conversations and see what&apos;s new.</p>
+        </div>
 
-        {/* RIGHT: form */}
-        <section>
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: 24,
-              padding: '1.75rem',
-              boxShadow: '0 24px 50px rgba(15,23,42,0.45)',
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 20,
-                marginTop: 0,
-                marginBottom: 12,
-              }}
-            >
-              Log in
-            </h2>
+        <div className="auth-card">
+          <h2>Log in</h2>
 
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Email</span>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <label className="form-field">
+              Email
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                autoComplete="email"
                 required
-                style={fieldStyle}
               />
             </label>
 
-            <label style={{ display: 'block', marginBottom: 20 }}>
-              <span style={{ fontSize: 13, fontWeight: 500 }}>Password</span>
+            <label className="form-field">
+              Password
               <input
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                autoComplete="current-password"
                 required
-                style={fieldStyle}
               />
             </label>
 
             <button
               type="submit"
-              disabled={busy}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem',
-                borderRadius: 999,
-                border: 'none',
-                background:
-                  'linear-gradient(135deg, #6366f1, #db2777, #f97316)',
-                color: 'white',
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: busy ? 'default' : 'pointer',
-                opacity: busy ? 0.8 : 1,
-              }}
+              className="button button-primary"
+              disabled={loading}
             >
-              {busy ? 'Signing you in…' : 'Log in'}
+              {loading ? 'Logging in...' : 'Log in'}
             </button>
+          </form>
 
+          {status ? (
             <p
+              className="form-footnote"
               style={{
-                marginTop: 12,
-                fontSize: 13,
-                color: '#4b5563',
+                marginTop: 16,
+                color: status.type === 'error' ? '#b91c1c' : '#047857',
               }}
             >
-              New here?{' '}
-              <a
-                href="/auth/signup"
-                style={{ color: '#111827', fontWeight: 600 }}
-              >
-                Create an account
-              </a>
-              .
+              {status.message}
             </p>
-          </form>
-        </section>
+          ) : null}
+
+          <div className="auth-links">
+            <Link href="/forgot-password" className="form-link">
+              Forgot password?
+            </Link>
+            <Link href="/auth/signup" className="form-link">
+              Create an account
+            </Link>
+            <Link href="/" className="form-link">
+              Home
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
-
-const fieldStyle = {
-  width: '100%',
-  marginTop: 4,
-  padding: '0.55rem 0.75rem',
-  borderRadius: 12,
-  border: '1px solid #e5e7eb',
-  fontSize: 13,
-  outline: 'none',
-};

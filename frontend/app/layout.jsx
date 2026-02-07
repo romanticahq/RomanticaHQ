@@ -1,166 +1,93 @@
+import Link from 'next/link';
+import './globals.css';
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://romanticahq.com';
+
 export const metadata = {
-  title: 'RomanticaHQ',
-  description: 'Modern dating platform for real people and real connections.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'RomanticaHQ',
+    template: '%s | RomanticaHQ',
+  },
+  description: 'Modern dating for real people and intentional connections.',
+  applicationName: 'RomanticaHQ',
+  keywords: [
+    'dating',
+    'relationships',
+    'intentional dating',
+    'romantic connections',
+    'dating app',
+  ],
+  openGraph: {
+    title: 'RomanticaHQ',
+    description:
+      'A calm, intentional dating platform built for real people and real connection.',
+    url: '/',
+    siteName: 'RomanticaHQ',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RomanticaHQ',
+    description:
+      'A calm, intentional dating platform built for real people and real connection.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#0b1020',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          fontFamily:
-            'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
-          backgroundColor: '#0b1120',
-          color: '#020617',
-        }}
-      >
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* HEADER */}
-          <header
-            style={{
-              width: '100%',
-              padding: '1rem 1.5rem',
-              position: 'sticky',
-              top: 0,
-              zIndex: 20,
-              backdropFilter: 'blur(12px)',
-              background:
-                'linear-gradient(to right, rgba(15,23,42,0.9), rgba(24,24,27,0.9))',
-              borderBottom: '1px solid rgba(148,163,184,0.25)',
-            }}
-          >
-            <div
-              style={{
-                maxWidth: 1040,
-                margin: '0 auto',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              {/* LOGO */}
-              <a
-                href="/"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  textDecoration: 'none',
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 999,
-                    background:
-                      'radial-gradient(circle at 30% 0, #f97316, #db2777)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: 18,
-                  }}
-                >
+      <body>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+
+        <div className="site-shell">
+          <header className="site-header">
+            <div className="site-header-inner">
+              <Link href="/" className="logo">
+                <span className="logo-mark" aria-hidden="true">
                   R
-                </div>
-                <span
-                  style={{
-                    color: 'white',
-                    fontWeight: 600,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  RomanticaHQ
                 </span>
-              </a>
+                <span className="logo-text">RomanticaHQ</span>
+              </Link>
 
-              {/* NAV */}
-              <nav
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                }}
-              >
-                <a
-                  href="/auth/login"
-                  style={{
-                    color: '#e5e7eb',
-                    fontSize: 14,
-                    textDecoration: 'none',
-                  }}
-                >
+              <nav className="site-nav" aria-label="Primary">
+                <Link href="/auth/login" className="nav-link">
                   Log in
-                </a>
-
-                <a
-                  href="/auth/signup"
-                  style={{
-                    padding: '0.45rem 0.95rem',
-                    borderRadius: 999,
-                    background:
-                      'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-                    color: 'white',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                  }}
-                >
+                </Link>
+                <Link href="/auth/signup" className="button button-primary">
                   Join for free
-                </a>
+                </Link>
               </nav>
             </div>
           </header>
 
-          {/* MAIN CONTENT */}
-          <main style={{ flex: 1 }}>{children}</main>
+          <main id="main-content" className="site-main">
+            {children}
+          </main>
 
-          {/* FOOTER */}
-          <footer
-            style={{
-              borderTop: '1px solid rgba(148,163,184,0.25)',
-              backgroundColor: '#020617',
-              padding: '1rem 1.5rem',
-              color: '#9ca3af',
-            }}
-          >
-            <div
-              style={{
-                maxWidth: 1040,
-                margin: '0 auto',
-                display: 'flex',
-                flexWrap: 'wrap',
-                rowGap: 8,
-                columnGap: 16,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: 12,
-              }}
-            >
+          <footer className="site-footer">
+            <div className="site-footer-inner">
               <span>
                 © {new Date().getFullYear()} RomanticaHQ. All rights reserved.
               </span>
-
-              {/* FIXED FOOTER LINKS */}
-              <div style={{ display: 'flex', gap: 12 }}>
-                <a href="/terms" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
-                  Terms
-                </a>
-                <a href="/privacy" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
-                  Privacy
-                </a>
-                <a href="/safety" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
-                  Safety
-                </a>
+              <div className="footer-links">
+                <Link href="/terms">Terms</Link>
+                <Link href="/privacy">Privacy</Link>
+                <Link href="/safety">Safety</Link>
               </div>
             </div>
           </footer>
