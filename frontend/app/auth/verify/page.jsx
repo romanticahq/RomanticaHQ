@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function VerifyPage() {
-  const apiBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+  // Prefer same-origin API calls in production. In development you can set
+  // NEXT_PUBLIC_API_BASE_URL=http://localhost:8080 if you run the API separately.
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   const [status, setStatus] = useState({
     type: 'info',
     message: 'Verifying your email…',
@@ -20,9 +21,9 @@ export default function VerifyPage() {
       return;
     }
 
-    fetch(`${apiBase}/api/auth/verify-email?token=${token}`)
+    fetch(`${apiBase}/api/auth/verify-email?token=${encodeURIComponent(token)}`)
       .then(async (res) => {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           throw new Error(data.error || 'Verification failed.');
         }

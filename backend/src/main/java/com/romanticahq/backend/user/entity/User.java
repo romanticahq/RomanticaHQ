@@ -38,6 +38,14 @@ public class User {
     @Column
     private Instant verificationTokenExpiry;
 
+    // ========= PASSWORD RESET =========
+
+    @Column
+    private String passwordResetToken;
+
+    @Column
+    private Instant passwordResetTokenExpiry;
+
     public User() {}
 
     // ===== GETTERS & SETTERS =====
@@ -68,4 +76,10 @@ public class User {
 
     public Instant getVerificationTokenExpiry() { return verificationTokenExpiry; }
     public void setVerificationTokenExpiry(Instant verificationTokenExpiry) { this.verificationTokenExpiry = verificationTokenExpiry; }
+
+    public String getPasswordResetToken() { return passwordResetToken; }
+    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
+
+    public Instant getPasswordResetTokenExpiry() { return passwordResetTokenExpiry; }
+    public void setPasswordResetTokenExpiry(Instant passwordResetTokenExpiry) { this.passwordResetTokenExpiry = passwordResetTokenExpiry; }
 }

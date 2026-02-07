@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-export default function ForgotPasswordPage() {
+export default function ResetPasswordPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const token = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    return new URLSearchParams(window.location.search).get('token') || '';
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -18,14 +23,14 @@ export default function ForgotPasswordPage() {
     const payload = Object.fromEntries(formData.entries());
 
     try {
-      const res = await fetch(`${apiBase}/api/auth/forgot-password`, {
+      const res = await fetch(`${apiBase}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ token, ...payload }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || 'Could not send reset email.');
+        throw new Error(data.error || 'Could not reset password.');
       }
       setStatus({ type: 'success', message: data.message });
       formEl?.reset?.();
@@ -40,23 +45,35 @@ export default function ForgotPasswordPage() {
     <section className="auth-hero auth-hero--image">
       <div className="auth-hero-inner">
         <div className="auth-hero-copy">
-          <h1>Reset your password.</h1>
-          <p>Enter your email and we&apos;ll send you a reset link.</p>
+          <h1>Set a new password.</h1>
+          <p>Choose a new password to regain access to your account.</p>
         </div>
 
         <div className="auth-card">
-          <h2>Forgot password</h2>
+          <h2>Reset password</h2>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <label className="form-field">
-              Email
-              <input type="email" name="email" autoComplete="email" required />
-            </label>
+          {!token ? (
+            <p className="form-footnote" style={{ marginTop: 12, color: '#b91c1c' }}>
+              Missing reset token. Please request a new reset link.
+            </p>
+          ) : (
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <label className="form-field">
+                New password
+                <input
+                  type="password"
+                  name="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                />
+              </label>
 
-            <button type="submit" className="button button-primary" disabled={loading}>
-              {loading ? 'Sending...' : 'Send reset link'}
-            </button>
-          </form>
+              <button type="submit" className="button button-primary" disabled={loading}>
+                {loading ? 'Saving...' : 'Save new password'}
+              </button>
+            </form>
+          )}
 
           {status ? (
             <p
@@ -83,3 +100,4 @@ export default function ForgotPasswordPage() {
     </section>
   );
 }
+

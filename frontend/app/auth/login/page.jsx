@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function LoginPage() {
-  const apiBase =
-    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+  // Prefer same-origin API calls in production. In development you can set
+  // NEXT_PUBLIC_API_BASE_URL=http://localhost:8080 if you run the API separately.
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +15,8 @@ export default function LoginPage() {
     setLoading(true);
     setStatus(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formEl = event.currentTarget;
+    const formData = new FormData(formEl);
     const payload = Object.fromEntries(formData.entries());
 
     try {
@@ -35,7 +37,7 @@ export default function LoginPage() {
       }
 
       setStatus({ type: 'success', message: data.message });
-      event.currentTarget.reset();
+      formEl?.reset?.();
     } catch (err) {
       setStatus({ type: 'error', message: err.message });
     } finally {
