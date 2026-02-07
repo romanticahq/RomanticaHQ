@@ -1,18 +1,35 @@
 package com.romanticahq.backend.config;
 
+import com.romanticahq.backend.security.JwtAuthFilter;
+import com.romanticahq.backend.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+    private final JwtAuthFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
+
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter, RateLimitFilter rateLimitFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.rateLimitFilter = rateLimitFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,12 +40,16 @@ public class WebSecurityConfig {
                 .requestMatchers(
                     "/api/health",
                     "/api/users/register",
-                    "/api/users/login"
+                    "/api/users/login",
+                    "/api/auth/**"
                 ).permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults())
-            .cors(Customizer.withDefaults());
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtAuthFilter, RateLimitFilter.class);
 
         return http.build();
     }
@@ -36,5 +57,23 @@ public class WebSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        String origins = System.getenv().getOrDefault("CORS_ALLOWED_ORIGINS", "http://localhost:3000");
+        List<String> allowedOrigins = Arrays.stream(origins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        config.setAllowedOrigins(allowedOrigins);
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
