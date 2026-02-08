@@ -35,6 +35,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            // Nginx owns these security headers for consistent behavior across frontend + API.
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.disable())
+                .contentTypeOptions(contentType -> contentType.disable())
+            )
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
