@@ -1,0 +1,70 @@
+:root {
+  color-scheme: dark;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: #020617;
+}
+
+/* iOS Safari: avoid input zoom on focus. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Ensure full-height sections behave on mobile browser UI. */
+.rhq-fullscreen {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+/* Responsive overrides for inline-styled grids. */
+@media (max-width: 960px) {
+  .rhq-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rhq-card-fixed {
+    height: auto !important;
+  }
+
+  .rhq-auth-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .rhq-main-pad {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .rhq-title-xl {
+    font-size: 32px !important;
+    line-height: 1.1 !important;
+  }
+
+  .rhq-header-inner {
+    flex-wrap: wrap !important;
+    row-gap: 10px !important;
+  }
+
+  .rhq-nav {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+  }
+}
+

@@ -57,6 +57,7 @@ export default function SignupPage() {
 
   return (
     <div
+      className="rhq-fullscreen rhq-main-pad"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
@@ -68,6 +69,7 @@ export default function SignupPage() {
       }}
     >
       <div
+        className="rhq-auth-grid"
         style={{
           width: '100%',
           maxWidth: 960,

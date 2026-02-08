@@ -1,3 +1,5 @@
+import './globals.css';
+
 export const metadata = {
   title: 'RomanticaHQ',
   description: 'Modern dating platform for real people and real connections.',
@@ -37,6 +39,7 @@ export default function RootLayout({ children }) {
             }}
           >
             <div
+              className="rhq-header-inner"
               style={{
                 maxWidth: 1040,
                 margin: '0 auto',
@@ -85,6 +88,7 @@ export default function RootLayout({ children }) {
 
               {/* NAV */}
               <nav
+                className="rhq-nav"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
