@@ -15,10 +15,10 @@ spring:
     baseline-on-migrate: true
 
   mail:
-    host: ${MAIL_HOST:}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    host: ${MAIL_HOST:${SMTP_HOST:}}
+    port: ${MAIL_PORT:${SMTP_PORT:587}}
+    username: ${MAIL_USERNAME:${SMTP_USERNAME:}}
+    password: ${MAIL_PASSWORD:${SMTP_PASSWORD:}}
     properties:
       mail:
         smtp:
@@ -49,5 +49,5 @@ app:
 
 mail:
   enabled: ${MAIL_ENABLED:false}
-  from: ${MAIL_FROM:no-reply@romanticahq.com}
-  from-name: ${MAIL_FROM_NAME:RomanticaHQ}
+  from: ${MAIL_FROM:${EMAIL_FROM:no-reply@romanticahq.com}}
+  from-name: ${MAIL_FROM_NAME:${EMAIL_FROM_NAME:RomanticaHQ}}
