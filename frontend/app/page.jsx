@@ -1,6 +1,7 @@
 export default function HomePage() {
   return (
     <main
+      className="rhq-fullscreen rhq-main-pad"
       style={{
         minHeight: "100vh",
         background:
@@ -13,6 +14,7 @@ export default function HomePage() {
     >
       {/* HERO + CTA ROW */}
       <div
+        className="rhq-hero-grid"
         style={{
           maxWidth: 1040,
           width: "100%",
@@ -50,6 +52,7 @@ export default function HomePage() {
           </div>
 
           <h1
+            className="rhq-title-xl"
             style={{
               fontSize: 40,
               lineHeight: 1.1,
@@ -178,6 +181,7 @@ export default function HomePage() {
         {/* RIGHT SIDE – CTA CARD WITH LENKA & JOHN */}
         <section style={{ display: "flex", justifyContent: "center" }}>
           <div
+            className="rhq-card-fixed"
             style={{
               position: "relative",
               width: "100%",
