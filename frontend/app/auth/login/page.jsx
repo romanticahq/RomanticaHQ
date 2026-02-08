@@ -128,6 +128,23 @@ export default function LoginPage() {
               />
             </label>
 
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 12,
+                marginBottom: 16,
+                fontSize: 13,
+              }}
+            >
+              <a href="/forgot-password" style={{ color: '#111827', fontWeight: 600 }}>
+                Forgot password?
+              </a>
+              <a href="/" style={{ color: '#4b5563', textDecoration: 'none' }}>
+                Back home
+              </a>
+            </div>
+
             <button
               type="submit"
               disabled={busy}
