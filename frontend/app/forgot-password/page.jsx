@@ -1,34 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+import { apiFetch } from '../lib/api';
+import { useToast } from '../lib/toast';
 
 export default function ForgotPasswordPage() {
+  const { pushToast } = useToast();
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBusy(true);
-    setMessage('');
+    setInfo('');
+    setError('');
 
     try {
-      const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+      const data = await apiFetch('/api/auth/forgot-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Request failed');
-      }
-
-      setMessage('If that email exists, a reset link has been sent.');
+      setInfo(data?.message || 'If that email exists, a reset link has been sent.');
+      pushToast('If the email exists, a reset link has been sent.', 'success');
     } catch (err) {
-      setMessage(`Error: ${err.message}`);
+      setError(err.message || 'Request failed');
+      pushToast(err.message || 'Request failed', 'error');
     } finally {
       setBusy(false);
     }
@@ -36,15 +34,13 @@ export default function ForgotPasswordPage() {
 
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(251,113,133,0.16), transparent 55%), #020617',
       }}
     >
       <div style={{ width: '100%', maxWidth: 560 }}>
@@ -78,14 +74,10 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={busy}
+            className="rhq-btn-primary"
             style={{
               width: '100%',
               padding: '0.8rem 1rem',
-              borderRadius: 999,
-              border: 'none',
-              background: 'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-              color: 'white',
-              fontWeight: 600,
               fontSize: 14,
               cursor: busy ? 'default' : 'pointer',
               opacity: busy ? 0.8 : 1,
@@ -94,8 +86,11 @@ export default function ForgotPasswordPage() {
             {busy ? 'Sending…' : 'Send reset link'}
           </button>
 
-          {message ? (
-            <p style={{ marginTop: 12, fontSize: 13, color: '#111827' }}>{message}</p>
+          {error ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#991b1b' }}>{error}</p>
+          ) : null}
+          {info ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#065f46' }}>{info}</p>
           ) : null}
 
           <div

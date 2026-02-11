@@ -1,4 +1,6 @@
 import './globals.css';
+import Link from 'next/link';
+import Providers from './providers';
 
 export const metadata = {
   title: 'RomanticaHQ',
@@ -8,36 +10,29 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          fontFamily:
-            'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
-          backgroundColor: '#0b1120',
-          color: '#020617',
-        }}
-      >
-        <div
-          style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* HEADER */}
-          <header
+      <body>
+        <Providers>
+          <div
             style={{
-              width: '100%',
-              padding: '1rem 1.5rem',
-              position: 'sticky',
-              top: 0,
-              zIndex: 20,
-              backdropFilter: 'blur(12px)',
-              background:
-                'linear-gradient(to right, rgba(15,23,42,0.9), rgba(24,24,27,0.9))',
-              borderBottom: '1px solid rgba(148,163,184,0.25)',
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
+            {/* HEADER */}
+            <header
+              style={{
+                width: '100%',
+                padding: '1rem 1.5rem',
+                position: 'sticky',
+                top: 0,
+                zIndex: 20,
+                backdropFilter: 'blur(12px)',
+                background:
+                  'linear-gradient(to right, rgba(15,23,42,0.9), rgba(24,24,27,0.9))',
+                borderBottom: '1px solid rgba(148,163,184,0.25)',
+              }}
+            >
             <div
               className="rhq-header-inner"
               style={{
@@ -49,7 +44,7 @@ export default function RootLayout({ children }) {
               }}
             >
               {/* LOGO */}
-              <a
+              <Link
                 href="/"
                 style={{
                   display: 'flex',
@@ -84,7 +79,7 @@ export default function RootLayout({ children }) {
                 >
                   RomanticaHQ
                 </span>
-              </a>
+              </Link>
 
               {/* NAV */}
               <nav
@@ -95,7 +90,7 @@ export default function RootLayout({ children }) {
                   gap: 12,
                 }}
               >
-                <a
+                <Link
                   href="/auth/login"
                   style={{
                     color: '#e5e7eb',
@@ -104,39 +99,31 @@ export default function RootLayout({ children }) {
                   }}
                 >
                   Log in
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/auth/signup"
-                  style={{
-                    padding: '0.45rem 0.95rem',
-                    borderRadius: 999,
-                    background:
-                      'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-                    color: 'white',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                  }}
+                  className="rhq-btn-primary"
+                  style={{ padding: '0.55rem 1rem', fontSize: 14 }}
                 >
                   Join for free
-                </a>
+                </Link>
               </nav>
             </div>
-          </header>
+            </header>
 
           {/* MAIN CONTENT */}
-          <main style={{ flex: 1 }}>{children}</main>
+            <main style={{ flex: 1 }}>{children}</main>
 
           {/* FOOTER */}
-          <footer
-            style={{
-              borderTop: '1px solid rgba(148,163,184,0.25)',
-              backgroundColor: '#020617',
-              padding: '1rem 1.5rem',
-              color: '#9ca3af',
-            }}
-          >
+            <footer
+              style={{
+                borderTop: '1px solid rgba(148,163,184,0.25)',
+                backgroundColor: '#020617',
+                padding: '1rem 1.5rem',
+                color: '#9ca3af',
+              }}
+            >
             <div
               style={{
                 maxWidth: 1040,
@@ -156,19 +143,20 @@ export default function RootLayout({ children }) {
 
               {/* FIXED FOOTER LINKS */}
               <div style={{ display: 'flex', gap: 12 }}>
-                <a href="/terms" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                <Link href="/terms" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Terms
-                </a>
-                <a href="/privacy" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                </Link>
+                <Link href="/privacy" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Privacy
-                </a>
-                <a href="/safety" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
+                </Link>
+                <Link href="/safety" style={{ color: '#e5e7eb', textDecoration: 'none' }}>
                   Safety
-                </a>
+                </Link>
               </div>
             </div>
-          </footer>
-        </div>
+            </footer>
+          </div>
+        </Providers>
       </body>
     </html>
   );

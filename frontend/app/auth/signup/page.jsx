@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+import { useRouter } from 'next/navigation';
+import { apiFetch } from '../../lib/api';
+import { useToast } from '../../lib/toast';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -14,6 +17,7 @@ export default function SignupPage() {
   });
 
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -24,6 +28,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setBusy(true);
 
     const payload = {
@@ -35,21 +40,16 @@ export default function SignupPage() {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/register`, {
+      await apiFetch('/api/users/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Signup failed');
-      }
-
-      alert('Account created! You can now log in.');
-      window.location.href = '/auth/login';
+      const encodedEmail = encodeURIComponent(form.email.trim().toLowerCase());
+      pushToast('Account created. Verify your email before logging in.', 'success');
+      router.push(`/auth/login?registered=1&email=${encodedEmail}`);
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      setError(err.message || 'Signup failed');
+      pushToast(err.message || 'Signup failed', 'error');
     } finally {
       setBusy(false);
     }
@@ -57,15 +57,13 @@ export default function SignupPage() {
 
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(236,72,153,0.16), transparent 55%), #020617',
       }}
     >
       <div
@@ -117,9 +115,9 @@ export default function SignupPage() {
               fontSize: 13,
             }}
           >
-            <li>💗 Free to join. No payment required to start.</li>
-            <li>🛡️ You stay in control of your data and privacy.</li>
-            <li>🚫 Zero tolerance for harassment or abuse.</li>
+            <li>Free to join. No payment required to start.</li>
+            <li>You stay in control of your data and privacy.</li>
+            <li>Zero tolerance for harassment or abuse.</li>
           </ul>
         </section>
 
@@ -250,6 +248,10 @@ export default function SignupPage() {
             >
               {busy ? 'Creating your account…' : 'Create account'}
             </button>
+
+            {error ? (
+              <p style={{ marginTop: 10, fontSize: 13, color: '#991b1b' }}>{error}</p>
+            ) : null}
 
             <p
               style={{

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" fill="none">
+  <defs>
+    <linearGradient id="rg" x1="160" y1="120" x2="1040" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316"/>
+      <stop offset="0.45" stop-color="#DB2777"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.85 0" result="c"/>
+      <feMerge>
+        <feMergeNode in="c"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.08 0" result="a"/>
+      <feComposite in="a" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <!-- Minimal line-art "couple" silhouette + heart. Designed as a watermark for dark backgrounds. -->
+  <g opacity="0.42" filter="url(#soft)">
+    <!-- Woman profile -->
+    <path
+      d="M455 642c-58-82-55-144-31-196 23-50 74-77 125-66 50 11 87 55 84 110-2 52-36 92-78 112 43 8 95 34 132 86"
+      stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"
+    />
+    <path
+      d="M482 438c-36-30-47-66-34-98 14-34 53-56 96-52 41 4 75 28 86 61 12 35-2 74-35 99"
+      stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"
+    />
+
+    <!-- Man profile -->
+    <path
+      d="M720 650c64-80 68-146 45-202-22-53-76-86-135-82-57 4-104 45-110 103-6 58 30 110 98 130-46 6-109 33-152 92"
+      stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"
+    />
+    <path
+      d="M744 438c28-28 36-60 24-93-12-34-46-59-87-64-44-5-83 13-100 44-18 33-12 74 17 110"
+      stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"
+    />
+
+    <!-- Heart between them -->
+    <path
+      d="M596 395c20-26 50-27 70-10 22 19 24 55 0 80-18 20-49 42-70 56-21-14-52-36-70-56-24-25-22-61 0-80 20-17 50-16 70 10z"
+      stroke="url(#rg)" stroke-width="10" stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Add a subtle grain overlay so it doesn't look "flat" on large backgrounds -->
+  <rect x="0" y="0" width="1200" height="800" fill="transparent" filter="url(#grain)"/>
+</svg>
+

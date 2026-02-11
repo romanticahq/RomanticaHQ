@@ -1,36 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+import { useRouter } from 'next/navigation';
+import { apiFetch } from '../lib/api';
+import { useToast } from '../lib/toast';
 
 export default function ResetPasswordClient({ token }) {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBusy(true);
-    setMessage('');
+    setInfo('');
+    setError('');
 
     try {
       if (!token) throw new Error('Missing reset token.');
 
-      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+      const data = await apiFetch('/api/auth/reset-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password }),
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Reset failed');
-      }
-
-      setMessage('Password updated. You can now log in.');
+      setInfo(data?.message || 'Password updated. You can now log in.');
+      pushToast('Password updated. You can now log in.', 'success');
+      router.push('/auth/login?reset=1');
     } catch (err) {
-      setMessage(`Error: ${err.message}`);
+      setError(err.message || 'Reset failed');
+      pushToast(err.message || 'Reset failed', 'error');
     } finally {
       setBusy(false);
     }
@@ -38,15 +39,13 @@ export default function ResetPasswordClient({ token }) {
 
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(129,140,248,0.16), transparent 55%), #020617',
       }}
     >
       <div style={{ width: '100%', maxWidth: 560 }}>
@@ -80,7 +79,7 @@ export default function ResetPasswordClient({ token }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={10}
+              minLength={6}
               style={fieldStyle}
             />
           </label>
@@ -88,14 +87,10 @@ export default function ResetPasswordClient({ token }) {
           <button
             type="submit"
             disabled={busy}
+            className="rhq-btn-primary"
             style={{
               width: '100%',
               padding: '0.8rem 1rem',
-              borderRadius: 999,
-              border: 'none',
-              background: 'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-              color: 'white',
-              fontWeight: 600,
               fontSize: 14,
               cursor: busy ? 'default' : 'pointer',
               opacity: busy ? 0.8 : 1,
@@ -104,9 +99,14 @@ export default function ResetPasswordClient({ token }) {
             {busy ? 'Saving…' : 'Save new password'}
           </button>
 
-          {message ? (
-            <p style={{ marginTop: 12, fontSize: 13, color: '#111827' }}>
-              {message}
+          {error ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#991b1b' }}>
+              {error}
+            </p>
+          ) : null}
+          {info ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#065f46' }}>
+              {info}
             </p>
           ) : null}
 
@@ -141,4 +141,3 @@ const fieldStyle = {
   fontSize: 13,
   outline: 'none',
 };
-
