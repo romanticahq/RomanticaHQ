@@ -15,7 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,9 +61,11 @@ public class WebSecurityConfig {
             )
             .cors(cors -> {});
 
-        http.addFilterBefore(requestCorrelationFilter, AnonymousAuthenticationFilter.class);
-        http.addFilterBefore(csrfOriginFilter, AuthRateLimitFilter.class);
-        http.addFilterBefore(authRateLimitFilter, AnonymousAuthenticationFilter.class);
+        // Anchor custom filters to a built-in Spring Security filter to avoid
+        // "does not have a registered order" errors on custom filter classes.
+        http.addFilterBefore(requestCorrelationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(csrfOriginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
