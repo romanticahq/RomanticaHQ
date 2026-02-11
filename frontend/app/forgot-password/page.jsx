@@ -1,40 +1,28 @@
 'use client';
 
 import { useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBusy(true);
-    setMessage('');
+    setInfo('');
+    setError('');
 
     try {
-      const res = await fetch(`/api/auth/forgot-password`, {
+      const data = await apiFetch('/api/auth/forgot-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-
-      if (!res.ok) {
-        let msg = 'Request failed';
-        try {
-          const json = await res.json();
-          msg = json?.error || json?.message || msg;
-        } catch {
-          const text = await res.text();
-          msg = text || msg;
-        }
-        throw new Error(msg);
-      }
-
-      const data = await res.json().catch(() => null);
-      setMessage(data?.message || 'If that email exists, a reset link has been sent.');
+      setInfo(data?.message || 'If that email exists, a reset link has been sent.');
     } catch (err) {
-      setMessage(`Error: ${err.message}`);
+      setError(err.message || 'Request failed');
     } finally {
       setBusy(false);
     }
@@ -94,8 +82,11 @@ export default function ForgotPasswordPage() {
             {busy ? 'Sending…' : 'Send reset link'}
           </button>
 
-          {message ? (
-            <p style={{ marginTop: 12, fontSize: 13, color: '#111827' }}>{message}</p>
+          {error ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#991b1b' }}>{error}</p>
+          ) : null}
+          {info ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#065f46' }}>{info}</p>
           ) : null}
 
           <div

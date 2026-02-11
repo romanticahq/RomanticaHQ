@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AppShell from '../app-shell';
 import { apiFetch } from '../../lib/api';
 
@@ -44,6 +45,7 @@ function ProfileCard({ p, onLike, onPass, onSuggest }) {
 }
 
 export default function MatchesPage() {
+  const router = useRouter();
   const [items, setItems] = useState([]);
   const [busyId, setBusyId] = useState(null);
   const [info, setInfo] = useState('');
@@ -68,8 +70,12 @@ export default function MatchesPage() {
       });
       setItems((prev) => prev.filter((x) => x.userId !== p.userId));
       if (res?.matched) {
+        const conversationId = res?.conversationId;
+        if (conversationId) {
+          router.push(`/app/chat?conversationId=${encodeURIComponent(conversationId)}`);
+          return;
+        }
         setInfo('Matched. You can now chat.');
-        // Keep it simple for now: user goes to chat page.
       }
     } catch (e) {
       setInfo(e.message);
@@ -134,4 +140,3 @@ export default function MatchesPage() {
     </AppShell>
   );
 }
-

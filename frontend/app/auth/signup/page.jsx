@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { apiFetch } from '../../lib/api';
 
 export default function SignupPage() {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ export default function SignupPage() {
   });
 
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -22,6 +24,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setBusy(true);
 
     const payload = {
@@ -33,29 +36,14 @@ export default function SignupPage() {
     };
 
     try {
-      const res = await fetch(`/api/users/register`, {
+      await apiFetch('/api/users/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        let msg = 'Signup failed';
-        try {
-          const json = await res.json();
-          msg = json?.error || json?.message || msg;
-        } catch {
-          const text = await res.text();
-          msg = text || msg;
-        }
-        throw new Error(msg);
-      }
-
-      const data = await res.json().catch(() => null);
-      alert(data?.message || 'Account created! Please check your email to verify your account.');
-      window.location.href = '/auth/login';
+      const encodedEmail = encodeURIComponent(form.email.trim().toLowerCase());
+      window.location.href = `/auth/login?registered=1&email=${encodedEmail}`;
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      setError(err.message || 'Signup failed');
     } finally {
       setBusy(false);
     }
@@ -254,6 +242,10 @@ export default function SignupPage() {
             >
               {busy ? 'Creating your account…' : 'Create account'}
             </button>
+
+            {error ? (
+              <p style={{ marginTop: 10, fontSize: 13, color: '#991b1b' }}>{error}</p>
+            ) : null}
 
             <p
               style={{

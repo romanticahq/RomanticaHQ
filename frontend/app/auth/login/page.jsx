@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { apiFetch } from '../../lib/api';
 import { setUser } from '../../lib/auth';
 
 export default function LoginPage() {
@@ -13,6 +14,21 @@ export default function LoginPage() {
 
   const verificationBlocked = /verify your email/i.test(error);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === '1') {
+      setInfo('Account created. Check your email to verify your account before logging in.');
+    } else if (params.get('reset') === '1') {
+      setInfo('Password updated. You can now log in.');
+    }
+
+    const emailFromQuery = params.get('email');
+    if (emailFromQuery) {
+      setEmail(emailFromQuery);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -20,28 +36,11 @@ export default function LoginPage() {
     setBusy(true);
 
     try {
-      const res = await fetch(`/api/users/login`, {
+      const data = await apiFetch('/api/users/login', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      if (!res.ok) {
-        let msg = 'Login failed';
-        try {
-          const json = await res.json();
-          msg = json?.error || json?.message || msg;
-        } catch {
-          const text = await res.text();
-          msg = text || msg;
-        }
-        throw new Error(msg);
-      }
-
-      const data = await res.json();
       if (data?.id) setUser(data);
-      alert('Logged in.');
       window.location.href = '/app';
     } catch (err) {
       setError(err.message || 'Login failed');
@@ -59,24 +58,10 @@ export default function LoginPage() {
     setInfo('');
     setError('');
     try {
-      const res = await fetch(`/api/auth/resend-verification`, {
+      const data = await apiFetch('/api/auth/resend-verification', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) {
-        let msg = 'Could not resend verification email';
-        try {
-          const json = await res.json();
-          msg = json?.error || json?.message || msg;
-        } catch {
-          const text = await res.text();
-          msg = text || msg;
-        }
-        throw new Error(msg);
-      }
-      const data = await res.json().catch(() => null);
       setInfo(data?.message || 'If this email exists, a verification link has been sent.');
     } catch (err) {
       setError(err.message || 'Could not resend verification email');

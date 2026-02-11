@@ -13,11 +13,24 @@ export default function ChatPage() {
   const [body, setBody] = useState('');
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [requestedConversationId, setRequestedConversationId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = new URLSearchParams(window.location.search).get('conversationId');
+    const id = Number(raw);
+    setRequestedConversationId(Number.isFinite(id) && id > 0 ? id : null);
+  }, []);
 
   const loadConvos = async () => {
     const data = await apiFetch('/api/conversations');
-    setConvos(Array.isArray(data) ? data : []);
-    if (!activeId && Array.isArray(data) && data[0]?.id) setActiveId(data[0].id);
+    const list = Array.isArray(data) ? data : [];
+    setConvos(list);
+    if (requestedConversationId && list.some((c) => c.id === requestedConversationId)) {
+      setActiveId(requestedConversationId);
+      return;
+    }
+    if (!activeId && list[0]?.id) setActiveId(list[0].id);
   };
 
   const loadMessages = async (conversationId) => {
@@ -28,7 +41,7 @@ export default function ChatPage() {
   useEffect(() => {
     loadConvos().catch((e) => setInfo(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [requestedConversationId]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -131,4 +144,3 @@ export default function ChatPage() {
     </AppShell>
   );
 }
-

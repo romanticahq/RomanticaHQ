@@ -1,42 +1,31 @@
 'use client';
 
 import { useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export default function ResetPasswordClient({ token }) {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setBusy(true);
-    setMessage('');
+    setInfo('');
+    setError('');
 
     try {
       if (!token) throw new Error('Missing reset token.');
 
-      const res = await fetch(`/api/auth/reset-password`, {
+      const data = await apiFetch('/api/auth/reset-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password }),
       });
-
-      if (!res.ok) {
-        let msg = 'Reset failed';
-        try {
-          const json = await res.json();
-          msg = json?.error || json?.message || msg;
-        } catch {
-          const text = await res.text();
-          msg = text || msg;
-        }
-        throw new Error(msg);
-      }
-
-      const data = await res.json().catch(() => null);
-      setMessage(data?.message || 'Password updated. You can now log in.');
+      setInfo(data?.message || 'Password updated. You can now log in.');
+      window.location.href = '/auth/login?reset=1';
     } catch (err) {
-      setMessage(`Error: ${err.message}`);
+      setError(err.message || 'Reset failed');
     } finally {
       setBusy(false);
     }
@@ -84,7 +73,7 @@ export default function ResetPasswordClient({ token }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={10}
+              minLength={6}
               style={fieldStyle}
             />
           </label>
@@ -104,9 +93,14 @@ export default function ResetPasswordClient({ token }) {
             {busy ? 'Saving…' : 'Save new password'}
           </button>
 
-          {message ? (
-            <p style={{ marginTop: 12, fontSize: 13, color: '#111827' }}>
-              {message}
+          {error ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#991b1b' }}>
+              {error}
+            </p>
+          ) : null}
+          {info ? (
+            <p style={{ marginTop: 12, fontSize: 13, color: '#065f46' }}>
+              {info}
             </p>
           ) : null}
 
