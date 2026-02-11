@@ -4,6 +4,7 @@ import com.romanticahq.backend.chat.dto.ConversationSummary;
 import com.romanticahq.backend.chat.dto.MessageResponse;
 import com.romanticahq.backend.chat.entity.Conversation;
 import com.romanticahq.backend.chat.entity.Message;
+import com.romanticahq.backend.chat.realtime.ChatWebSocketHandler;
 import com.romanticahq.backend.chat.repository.ConversationRepository;
 import com.romanticahq.backend.chat.repository.MessageRepository;
 import com.romanticahq.backend.user.entity.User;
@@ -21,15 +22,18 @@ public class ChatServiceImpl implements ChatService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final ChatWebSocketHandler chatWebSocketHandler;
 
     public ChatServiceImpl(
             ConversationRepository conversationRepository,
             MessageRepository messageRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ChatWebSocketHandler chatWebSocketHandler
     ) {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.chatWebSocketHandler = chatWebSocketHandler;
     }
 
     @Override
@@ -70,7 +74,9 @@ public class ChatServiceImpl implements ChatService {
         msg.setCreatedAt(Instant.now());
         messageRepository.save(msg);
 
-        return new MessageResponse(msg.getId(), sender.getId(), msg.getBody(), msg.getCreatedAt());
+        MessageResponse response = new MessageResponse(msg.getId(), sender.getId(), msg.getBody(), msg.getCreatedAt());
+        chatWebSocketHandler.broadcastToConversation(conversationId, response);
+        return response;
     }
 
     private Conversation requireConversationMember(long userId, long conversationId) {
@@ -84,4 +90,3 @@ public class ChatServiceImpl implements ChatService {
         return convo;
     }
 }
-

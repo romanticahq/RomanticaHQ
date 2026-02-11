@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AppShell from '../app-shell';
 import { apiFetch } from '../../lib/api';
 import { getUser } from '../../lib/auth';
@@ -14,6 +14,7 @@ export default function ChatPage() {
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [requestedConversationId, setRequestedConversationId] = useState(null);
+  const wsRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -46,6 +47,58 @@ export default function ChatPage() {
   useEffect(() => {
     if (!activeId) return;
     loadMessages(activeId).catch((e) => setInfo(e.message));
+  }, [activeId]);
+
+  useEffect(() => {
+    if (!activeId) return;
+    if (typeof window === 'undefined') return;
+
+    let reconnectTimer = null;
+    let disposed = false;
+
+    const closeCurrent = () => {
+      if (!wsRef.current) return;
+      wsRef.current.onclose = null;
+      wsRef.current.close();
+      wsRef.current = null;
+    };
+
+    const connect = () => {
+      const configured = process.env.NEXT_PUBLIC_WS_BASE_URL?.trim();
+      const base = configured
+        ? configured.replace(/\/$/, '')
+        : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
+      const url = `${base}/ws/chat?conversationId=${encodeURIComponent(activeId)}`;
+      const ws = new WebSocket(url);
+      wsRef.current = ws;
+
+      ws.onmessage = (event) => {
+        try {
+          const incoming = JSON.parse(event.data);
+          if (!incoming?.id) return;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === incoming.id)) return prev;
+            return [...prev, incoming];
+          });
+        } catch {
+          // Ignore invalid payloads.
+        }
+      };
+
+      ws.onclose = () => {
+        if (disposed) return;
+        reconnectTimer = setTimeout(connect, 1500);
+      };
+    };
+
+    closeCurrent();
+    connect();
+
+    return () => {
+      disposed = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      closeCurrent();
+    };
   }, [activeId]);
 
   const onSend = async (e) => {

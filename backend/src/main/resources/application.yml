@@ -13,6 +13,17 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS_ENABLE:true}
 
 server:
   port: 8080
@@ -27,3 +38,9 @@ security:
 
 cors:
   allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost,http://localhost:3000,https://romanticahq.com}
+
+app:
+  publicBaseUrl: ${PUBLIC_BASE_URL:https://romanticahq.com}
+  email:
+    enabled: ${EMAIL_ENABLED:false}
+    from: ${EMAIL_FROM:no-reply@romanticahq.com}

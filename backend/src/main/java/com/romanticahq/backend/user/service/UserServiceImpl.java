@@ -1,6 +1,7 @@
 package com.romanticahq.backend.user.service;
 
 import com.romanticahq.backend.auth.JwtService;
+import com.romanticahq.backend.notification.EmailService;
 import com.romanticahq.backend.user.dto.LoginRequest;
 import com.romanticahq.backend.user.dto.LoginResponse;
 import com.romanticahq.backend.user.dto.UserSummary;
@@ -27,13 +28,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
-                           JwtService jwtService) {
+                           JwtService jwtService,
+                           EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
 
     // ========== REGISTER ==========
@@ -69,9 +73,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        // For now we just log the verification link.
-        System.out.println("📧 Verification link for " + user.getEmail()
-                + ": https://romanticahq.com/auth/verify?token=" + token);
+        emailService.sendVerificationEmail(user.getEmail(), token);
     }
 
     // ========== LOGIN ==========
@@ -177,8 +179,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        System.out.println("📧 Resent verification link for " + user.getEmail()
-                + ": https://romanticahq.com/auth/verify?token=" + token);
+        emailService.sendVerificationEmail(user.getEmail(), token);
     }
 
     // ========== PASSWORD RESET ==========
@@ -199,9 +200,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswordResetTokenExpiry(Instant.now().plus(2, ChronoUnit.HOURS));
         userRepository.save(user);
 
-        // For now we just log the reset link.
-        System.out.println("🔐 Password reset link for " + user.getEmail()
-                + ": https://romanticahq.com/reset-password?token=" + token);
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
     }
 
     @Override

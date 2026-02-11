@@ -47,7 +47,8 @@ public class WebSecurityConfig {
                     "/api/auth/verify-email",
                     "/api/auth/resend-verification",
                     "/api/auth/forgot-password",
-                    "/api/auth/reset-password"
+                    "/api/auth/reset-password",
+                    "/ws/chat"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
