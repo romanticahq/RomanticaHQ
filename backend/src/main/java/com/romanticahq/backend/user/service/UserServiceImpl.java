@@ -99,7 +99,8 @@ public class UserServiceImpl implements UserService {
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            int failed = Math.max(0, user.getFailedLoginAttempts()) + 1;
+            int failedAttempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+            int failed = Math.max(0, failedAttempts) + 1;
             if (failed >= MAX_FAILED_LOGIN_ATTEMPTS) {
                 user.setFailedLoginAttempts(0);
                 user.setLoginLockedUntil(now.plus(LOGIN_LOCK_MINUTES, ChronoUnit.MINUTES));
@@ -117,7 +118,8 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Please verify your email before logging in.");
         }
 
-        if (user.getFailedLoginAttempts() != 0 || user.getLoginLockedUntil() != null) {
+        int failedAttempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+        if (failedAttempts != 0 || user.getLoginLockedUntil() != null) {
             user.setFailedLoginAttempts(0);
             user.setLoginLockedUntil(null);
             userRepository.save(user);

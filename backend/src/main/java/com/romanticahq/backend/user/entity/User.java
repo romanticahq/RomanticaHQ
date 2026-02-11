@@ -48,8 +48,8 @@ public class User {
 
     // ========= LOGIN PROTECTION =========
 
-    @Column(nullable = false)
-    private int failedLoginAttempts = 0;
+    @Column
+    private Integer failedLoginAttempts = 0;
 
     @Column
     private Instant loginLockedUntil;
@@ -91,8 +91,8 @@ public class User {
     public Instant getPasswordResetTokenExpiry() { return passwordResetTokenExpiry; }
     public void setPasswordResetTokenExpiry(Instant passwordResetTokenExpiry) { this.passwordResetTokenExpiry = passwordResetTokenExpiry; }
 
-    public int getFailedLoginAttempts() { return failedLoginAttempts; }
-    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+    public Integer getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(Integer failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
 
     public Instant getLoginLockedUntil() { return loginLockedUntil; }
     public void setLoginLockedUntil(Instant loginLockedUntil) { this.loginLockedUntil = loginLockedUntil; }
