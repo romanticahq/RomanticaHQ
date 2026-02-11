@@ -2,8 +2,10 @@ package com.romanticahq.backend.config;
 
 import com.romanticahq.backend.auth.JwtAuthFilter;
 import com.romanticahq.backend.security.AuthRateLimitFilter;
+import com.romanticahq.backend.security.CsrfOriginFilter;
 import com.romanticahq.backend.security.JsonAccessDeniedHandler;
 import com.romanticahq.backend.security.JsonAuthenticationEntryPoint;
+import com.romanticahq.backend.security.RequestCorrelationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +33,8 @@ public class WebSecurityConfig {
             HttpSecurity http,
             JwtAuthFilter jwtAuthFilter,
             AuthRateLimitFilter authRateLimitFilter,
+            RequestCorrelationFilter requestCorrelationFilter,
+            CsrfOriginFilter csrfOriginFilter,
             JsonAuthenticationEntryPoint authenticationEntryPoint,
             JsonAccessDeniedHandler accessDeniedHandler
     ) throws Exception {
@@ -58,6 +62,8 @@ public class WebSecurityConfig {
             )
             .cors(cors -> {});
 
+        http.addFilterBefore(requestCorrelationFilter, AnonymousAuthenticationFilter.class);
+        http.addFilterBefore(csrfOriginFilter, AuthRateLimitFilter.class);
         http.addFilterBefore(authRateLimitFilter, AnonymousAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -23,9 +23,7 @@ export async function apiFetch(path, options = {}) {
 
     if (res.status === 401 && typeof window !== 'undefined') {
       clearAuth();
-      if (!window.location.pathname.startsWith('/auth/')) {
-        window.location.href = '/auth/login';
-      }
+      window.dispatchEvent(new CustomEvent('rhq:unauthorized'));
     }
 
     throw err;

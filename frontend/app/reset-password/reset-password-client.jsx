@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '../lib/api';
+import { useToast } from '../lib/toast';
 
 export default function ResetPasswordClient({ token }) {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState('');
@@ -23,9 +27,11 @@ export default function ResetPasswordClient({ token }) {
         body: JSON.stringify({ token, newPassword: password }),
       });
       setInfo(data?.message || 'Password updated. You can now log in.');
-      window.location.href = '/auth/login?reset=1';
+      pushToast('Password updated. You can now log in.', 'success');
+      router.push('/auth/login?reset=1');
     } catch (err) {
       setError(err.message || 'Reset failed');
+      pushToast(err.message || 'Reset failed', 'error');
     } finally {
       setBusy(false);
     }

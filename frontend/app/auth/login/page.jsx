@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '../../lib/api';
 import { setUser } from '../../lib/auth';
+import { useToast } from '../../lib/toast';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -41,9 +45,11 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       if (data?.id) setUser(data);
-      window.location.href = '/app';
+      pushToast('Welcome back.', 'success');
+      router.push('/app');
     } catch (err) {
       setError(err.message || 'Login failed');
+      pushToast(err.message || 'Login failed', 'error');
     } finally {
       setBusy(false);
     }
@@ -65,6 +71,7 @@ export default function LoginPage() {
       setInfo(data?.message || 'If this email exists, a verification link has been sent.');
     } catch (err) {
       setError(err.message || 'Could not resend verification email');
+      pushToast(err.message || 'Could not resend verification email', 'error');
     } finally {
       setResending(false);
     }

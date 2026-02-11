@@ -1,12 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '../lib/api';
 import { clearAuth, getUser, setUser } from '../lib/auth';
+import { useToast } from '../lib/toast';
 
 export default function AppShell({ children, title }) {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [me, setMe] = useState(() => getUser());
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const onUnauthorized = () => {
+      pushToast('Your session expired. Please log in again.', 'error');
+      router.push('/auth/login');
+    };
+    window.addEventListener('rhq:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('rhq:unauthorized', onUnauthorized);
+  }, [pushToast, router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -19,7 +33,7 @@ export default function AppShell({ children, title }) {
         }
       } catch (e) {
         clearAuth();
-        window.location.href = '/auth/login';
+        router.push('/auth/login');
         return;
       } finally {
         if (!cancelled) setLoading(false);
@@ -37,7 +51,8 @@ export default function AppShell({ children, title }) {
       // Clear local state even if network fails.
     } finally {
       clearAuth();
-      window.location.href = '/';
+      pushToast('Logged out.', 'success');
+      router.push('/');
     }
   };
 
@@ -68,18 +83,18 @@ export default function AppShell({ children, title }) {
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a className="rhq-nav-link" href="/app">
+          <Link className="rhq-nav-link" href="/app">
             Dashboard
-          </a>
-          <a className="rhq-nav-link" href="/app/profile">
+          </Link>
+          <Link className="rhq-nav-link" href="/app/profile">
             Profile
-          </a>
-          <a className="rhq-nav-link" href="/app/matches">
+          </Link>
+          <Link className="rhq-nav-link" href="/app/matches">
             Matching
-          </a>
-          <a className="rhq-nav-link" href="/app/chat">
+          </Link>
+          <Link className="rhq-nav-link" href="/app/chat">
             Chat
-          </a>
+          </Link>
         </nav>
 
         <div style={{ marginTop: 'auto' }}>
@@ -103,9 +118,9 @@ export default function AppShell({ children, title }) {
               {title}
             </div>
           </div>
-          <a className="rhq-btn-primary" href="/app/matches" style={{ padding: '0.6rem 1rem', fontSize: 13 }}>
+          <Link className="rhq-btn-primary" href="/app/matches" style={{ padding: '0.6rem 1rem', fontSize: 13 }}>
             Find matches
-          </a>
+          </Link>
         </header>
 
         <main className="rhq-app-content">{children}</main>

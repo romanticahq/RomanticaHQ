@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { apiFetch } from '../lib/api';
+import { useToast } from '../lib/toast';
 
 export default function ForgotPasswordPage() {
+  const { pushToast } = useToast();
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState('');
@@ -21,8 +23,10 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       });
       setInfo(data?.message || 'If that email exists, a reset link has been sent.');
+      pushToast('If the email exists, a reset link has been sent.', 'success');
     } catch (err) {
       setError(err.message || 'Request failed');
+      pushToast(err.message || 'Request failed', 'error');
     } finally {
       setBusy(false);
     }

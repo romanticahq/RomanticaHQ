@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppShell from '../app-shell';
 import { apiFetch } from '../../lib/api';
+import { useToast } from '../../lib/toast';
 
 function ProfileCard({ p, onLike, onPass, onSuggest }) {
   return (
@@ -46,6 +47,7 @@ function ProfileCard({ p, onLike, onPass, onSuggest }) {
 
 export default function MatchesPage() {
   const router = useRouter();
+  const { pushToast } = useToast();
   const [items, setItems] = useState([]);
   const [busyId, setBusyId] = useState(null);
   const [info, setInfo] = useState('');
@@ -72,6 +74,7 @@ export default function MatchesPage() {
       if (res?.matched) {
         const conversationId = res?.conversationId;
         if (conversationId) {
+          pushToast('Matched. Opening chat now.', 'success');
           router.push(`/app/chat?conversationId=${encodeURIComponent(conversationId)}`);
           return;
         }
@@ -79,6 +82,7 @@ export default function MatchesPage() {
       }
     } catch (e) {
       setInfo(e.message);
+      pushToast(e.message, 'error');
     } finally {
       setBusyId(null);
     }
@@ -93,6 +97,7 @@ export default function MatchesPage() {
       setInfo(s ? `Suggestion: ${s}` : 'No suggestion yet.');
     } catch (e) {
       setInfo(e.message);
+      pushToast(e.message, 'error');
     } finally {
       setBusyId(null);
     }

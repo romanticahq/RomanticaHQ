@@ -4,7 +4,7 @@ import com.romanticahq.backend.chat.dto.ConversationSummary;
 import com.romanticahq.backend.chat.dto.MessageResponse;
 import com.romanticahq.backend.chat.entity.Conversation;
 import com.romanticahq.backend.chat.entity.Message;
-import com.romanticahq.backend.chat.realtime.ChatWebSocketHandler;
+import com.romanticahq.backend.chat.realtime.ChatRealtimePublisher;
 import com.romanticahq.backend.chat.repository.ConversationRepository;
 import com.romanticahq.backend.chat.repository.MessageRepository;
 import com.romanticahq.backend.user.entity.User;
@@ -22,18 +22,18 @@ public class ChatServiceImpl implements ChatService {
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
-    private final ChatWebSocketHandler chatWebSocketHandler;
+    private final ChatRealtimePublisher chatRealtimePublisher;
 
     public ChatServiceImpl(
             ConversationRepository conversationRepository,
             MessageRepository messageRepository,
             UserRepository userRepository,
-            ChatWebSocketHandler chatWebSocketHandler
+            ChatRealtimePublisher chatRealtimePublisher
     ) {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
-        this.chatWebSocketHandler = chatWebSocketHandler;
+        this.chatRealtimePublisher = chatRealtimePublisher;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ChatServiceImpl implements ChatService {
         messageRepository.save(msg);
 
         MessageResponse response = new MessageResponse(msg.getId(), sender.getId(), msg.getBody(), msg.getCreatedAt());
-        chatWebSocketHandler.broadcastToConversation(conversationId, response);
+        chatRealtimePublisher.publish(conversationId, response);
         return response;
     }
 

@@ -1,0 +1,15 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require CI success context
+        run: echo "Deploy gate reached. Connect this workflow to your deployment target/secrets."

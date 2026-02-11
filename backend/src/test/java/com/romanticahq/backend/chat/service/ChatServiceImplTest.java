@@ -3,7 +3,7 @@ package com.romanticahq.backend.chat.service;
 import com.romanticahq.backend.chat.dto.MessageResponse;
 import com.romanticahq.backend.chat.entity.Conversation;
 import com.romanticahq.backend.chat.entity.Message;
-import com.romanticahq.backend.chat.realtime.ChatWebSocketHandler;
+import com.romanticahq.backend.chat.realtime.ChatRealtimePublisher;
 import com.romanticahq.backend.chat.repository.ConversationRepository;
 import com.romanticahq.backend.chat.repository.MessageRepository;
 import com.romanticahq.backend.user.entity.User;
@@ -30,7 +30,7 @@ class ChatServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private ChatWebSocketHandler chatWebSocketHandler;
+    private ChatRealtimePublisher chatRealtimePublisher;
 
     private ChatServiceImpl service;
 
@@ -40,7 +40,7 @@ class ChatServiceImplTest {
                 conversationRepository,
                 messageRepository,
                 userRepository,
-                chatWebSocketHandler
+                chatRealtimePublisher
         );
     }
 
@@ -70,7 +70,7 @@ class ChatServiceImplTest {
         assertEquals(501L, response.getId());
         assertEquals(11L, response.getSenderId());
         assertEquals("hello", response.getBody());
-        verify(chatWebSocketHandler).broadcastToConversation(eq(77L), any(MessageResponse.class));
+        verify(chatRealtimePublisher).publish(eq(77L), any(MessageResponse.class));
     }
 
     @Test
@@ -91,6 +91,6 @@ class ChatServiceImplTest {
                 () -> service.sendMessage(99L, 88L, "not allowed")
         );
         assertEquals("Not allowed.", ex.getMessage());
-        verifyNoInteractions(chatWebSocketHandler);
+        verifyNoInteractions(chatRealtimePublisher);
     }
 }

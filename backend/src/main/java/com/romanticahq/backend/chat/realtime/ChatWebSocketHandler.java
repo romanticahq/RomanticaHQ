@@ -1,6 +1,7 @@
 package com.romanticahq.backend.chat.realtime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanticahq.backend.chat.dto.MessageResponse;
 import com.romanticahq.backend.chat.entity.Conversation;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,7 +75,25 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        // This endpoint is server-push only. Clients send messages via authenticated REST endpoint.
+        Long conversationId = longAttr(session, ATTR_CONVERSATION_ID);
+        Long userId = longAttr(session, JwtHandshakeInterceptor.ATTR_USER_ID);
+        if (conversationId == null || userId == null) return;
+
+        try {
+            Map<String, Object> payload = objectMapper.readValue(message.getPayload(), new TypeReference<>() {});
+            Object type = payload.get("type");
+            if (!"typing".equals(type)) return;
+
+            Map<String, Object> event = new HashMap<>();
+            event.put("type", "typing");
+            event.put("conversationId", conversationId);
+            event.put("userId", userId);
+            event.put("isTyping", Boolean.TRUE.equals(payload.get("isTyping")));
+            String json = objectMapper.writeValueAsString(event);
+            broadcastRawToConversation(conversationId, json, session.getId());
+        } catch (RuntimeException | JsonProcessingException ignored) {
+            // Ignore malformed client messages.
+        }
     }
 
     public void broadcastToConversation(long conversationId, MessageResponse payload) {
@@ -82,7 +102,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
         String json;
         try {
-            json = objectMapper.writeValueAsString(payload);
+            Map<String, Object> envelope = new HashMap<>();
+            envelope.put("type", "message");
+            envelope.put("conversationId", conversationId);
+            envelope.put("id", payload.getId());
+            envelope.put("senderId", payload.getSenderId());
+            envelope.put("body", payload.getBody());
+            envelope.put("createdAt", payload.getCreatedAt());
+            json = objectMapper.writeValueAsString(envelope);
         } catch (JsonProcessingException ex) {
             log.error("Failed to serialize websocket message", ex);
             return;
@@ -95,6 +122,28 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(text);
             } catch (IOException ex) {
                 log.warn("Failed to send websocket message to session {}", session.getId(), ex);
+            }
+        });
+    }
+
+    public int activeSessionCount() {
+        return sessionsByConversation.values().stream()
+                .mapToInt(Map::size)
+                .sum();
+    }
+
+    private void broadcastRawToConversation(long conversationId, String payload, String excludeSessionId) {
+        Map<String, WebSocketSession> sessions = sessionsByConversation.get(conversationId);
+        if (sessions == null || sessions.isEmpty()) return;
+
+        TextMessage text = new TextMessage(payload);
+        sessions.values().forEach(session -> {
+            if (!session.isOpen()) return;
+            if (excludeSessionId != null && excludeSessionId.equals(session.getId())) return;
+            try {
+                session.sendMessage(text);
+            } catch (IOException ex) {
+                log.warn("Failed to send websocket event to session {}", session.getId(), ex);
             }
         });
     }
@@ -144,4 +193,3 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         return null;
     }
 }
-

@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AppShell from '../app-shell';
 import { apiFetch } from '../../lib/api';
 import { getUser } from '../../lib/auth';
+import { useToast } from '../../lib/toast';
 
 export default function ChatPage() {
+  const { pushToast } = useToast();
   const me = useMemo(() => getUser(), []);
   const [convos, setConvos] = useState([]);
   const [activeId, setActiveId] = useState(null);
@@ -14,7 +16,10 @@ export default function ChatPage() {
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [requestedConversationId, setRequestedConversationId] = useState(null);
+  const [unreadByConversation, setUnreadByConversation] = useState({});
+  const [typingByConversation, setTypingByConversation] = useState({});
   const wsRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -43,6 +48,14 @@ export default function ChatPage() {
     loadConvos().catch((e) => setInfo(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedConversationId]);
+
+  useEffect(() => {
+    if (!activeId) return;
+    setUnreadByConversation((prev) => ({ ...prev, [activeId]: 0 }));
+    return () => {
+      if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current);
+    };
+  }, [activeId]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -75,11 +88,21 @@ export default function ChatPage() {
       ws.onmessage = (event) => {
         try {
           const incoming = JSON.parse(event.data);
+          if (incoming?.type === 'typing') {
+            if (incoming?.conversationId !== activeId || incoming?.userId === me?.id) return;
+            setTypingByConversation((prev) => ({ ...prev, [activeId]: Boolean(incoming?.isTyping) }));
+            return;
+          }
           if (!incoming?.id) return;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === incoming.id)) return prev;
-            return [...prev, incoming];
-          });
+
+          if (incoming.senderId !== me?.id && incoming.conversationId && incoming.conversationId !== activeId) {
+            setUnreadByConversation((prev) => ({
+              ...prev,
+              [incoming.conversationId]: (prev[incoming.conversationId] || 0) + 1,
+            }));
+          }
+
+          setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
         } catch {
           // Ignore invalid payloads.
         }
@@ -112,9 +135,11 @@ export default function ChatPage() {
         body: JSON.stringify({ body }),
       });
       setBody('');
+      setTypingByConversation((prev) => ({ ...prev, [activeId]: false }));
       setMessages((prev) => [...prev, msg]);
     } catch (e2) {
       setInfo(e2.message);
+      pushToast(e2.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -140,7 +165,12 @@ export default function ChatPage() {
                 }}
               >
                 <div style={{ fontWeight: 700, color: '#e5e7eb', fontSize: 13 }}>{c.otherFullName}</div>
-                <div style={{ color: '#94a3b8', fontSize: 12 }}>Conversation #{c.id}</div>
+                <div style={{ color: '#94a3b8', fontSize: 12, display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                  <span>Conversation #{c.id}</span>
+                  {unreadByConversation[c.id] ? (
+                    <span style={{ color: '#fde68a', fontWeight: 700 }}>{unreadByConversation[c.id]} new</span>
+                  ) : null}
+                </div>
               </button>
             ))}
           </div>
@@ -168,6 +198,9 @@ export default function ChatPage() {
           {info ? (
             <div style={{ color: '#fecaca', fontSize: 13, marginBottom: 10 }}>{info}</div>
           ) : null}
+          {typingByConversation[activeId] ? (
+            <div style={{ color: '#9ca3af', fontSize: 12, marginBottom: 8 }}>Typing…</div>
+          ) : null}
 
           <div className="rhq-chat-messages">
             {messages.map((m) => {
@@ -184,7 +217,18 @@ export default function ChatPage() {
             <input
               className="rhq-input"
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={(e) => {
+                const next = e.target.value;
+                setBody(next);
+                if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || !activeId) return;
+                wsRef.current.send(JSON.stringify({ type: 'typing', isTyping: true }));
+                if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current);
+                typingTimeoutRef.current = window.setTimeout(() => {
+                  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                    wsRef.current.send(JSON.stringify({ type: 'typing', isTyping: false }));
+                  }
+                }, 1200);
+              }}
               placeholder="Write a calm message…"
               disabled={!activeId || loading}
             />

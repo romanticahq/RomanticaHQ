@@ -27,17 +27,20 @@ public class UserController {
     private final String jwtCookieName;
     private final boolean jwtCookieSecure;
     private final long jwtExpirySeconds;
+    private final String jwtCookieSameSite;
 
     public UserController(
             UserService userService,
             @Value("${security.jwt.cookieName:RHQ_AUTH}") String jwtCookieName,
-            @Value("${security.jwt.cookieSecure:false}") boolean jwtCookieSecure,
-            @Value("${security.jwt.expirySeconds:604800}") long jwtExpirySeconds
+            @Value("${security.jwt.cookieSecure:true}") boolean jwtCookieSecure,
+            @Value("${security.jwt.expirySeconds:604800}") long jwtExpirySeconds,
+            @Value("${security.jwt.cookieSameSite:Strict}") String jwtCookieSameSite
     ) {
         this.userService = userService;
         this.jwtCookieName = jwtCookieName;
         this.jwtCookieSecure = jwtCookieSecure;
         this.jwtExpirySeconds = jwtExpirySeconds;
+        this.jwtCookieSameSite = jwtCookieSameSite;
     }
 
     // ========= REGISTER =========
@@ -59,7 +62,7 @@ public class UserController {
         ResponseCookie cookie = ResponseCookie.from(jwtCookieName, login.getToken())
                 .httpOnly(true)
                 .secure(jwtCookieSecure)
-                .sameSite("Lax")
+                .sameSite(jwtCookieSameSite)
                 .path("/")
                 .maxAge(jwtExpirySeconds)
                 .build();
@@ -73,7 +76,7 @@ public class UserController {
         ResponseCookie cookie = ResponseCookie.from(jwtCookieName, "")
                 .httpOnly(true)
                 .secure(jwtCookieSecure)
-                .sameSite("Lax")
+                .sameSite(jwtCookieSameSite)
                 .path("/")
                 .maxAge(0)
                 .build();

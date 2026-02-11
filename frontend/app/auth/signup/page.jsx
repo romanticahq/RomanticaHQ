@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '../../lib/api';
+import { useToast } from '../../lib/toast';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { pushToast } = useToast();
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -41,9 +45,11 @@ export default function SignupPage() {
         body: JSON.stringify(payload),
       });
       const encodedEmail = encodeURIComponent(form.email.trim().toLowerCase());
-      window.location.href = `/auth/login?registered=1&email=${encodedEmail}`;
+      pushToast('Account created. Verify your email before logging in.', 'success');
+      router.push(`/auth/login?registered=1&email=${encodedEmail}`);
     } catch (err) {
       setError(err.message || 'Signup failed');
+      pushToast(err.message || 'Signup failed', 'error');
     } finally {
       setBusy(false);
     }
