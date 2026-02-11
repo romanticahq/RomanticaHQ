@@ -1,50 +1,99 @@
 'use client';
 
 import { useState } from 'react';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+import { setUser } from '../../lib/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+  const [resending, setResending] = useState(false);
+
+  const verificationBlocked = /verify your email/i.test(error);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setInfo('');
     setBusy(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/login`, {
+      const res = await fetch(`/api/users/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Login failed');
+        let msg = 'Login failed';
+        try {
+          const json = await res.json();
+          msg = json?.error || json?.message || msg;
+        } catch {
+          const text = await res.text();
+          msg = text || msg;
+        }
+        throw new Error(msg);
       }
 
       const data = await res.json();
-      alert(`Welcome back, ${data.fullName || data.email}!`);
+      if (data?.id) setUser(data);
+      alert('Logged in.');
+      window.location.href = '/app';
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      setError(err.message || 'Login failed');
     } finally {
       setBusy(false);
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email.trim()) {
+      setError('Enter your email first, then resend verification.');
+      return;
+    }
+    setResending(true);
+    setInfo('');
+    setError('');
+    try {
+      const res = await fetch(`/api/auth/resend-verification`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        let msg = 'Could not resend verification email';
+        try {
+          const json = await res.json();
+          msg = json?.error || json?.message || msg;
+        } catch {
+          const text = await res.text();
+          msg = text || msg;
+        }
+        throw new Error(msg);
+      }
+      const data = await res.json().catch(() => null);
+      setInfo(data?.message || 'If this email exists, a verification link has been sent.');
+    } catch (err) {
+      setError(err.message || 'Could not resend verification email');
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(96,165,250,0.16), transparent 55%), #020617',
       }}
     >
       <div
@@ -164,6 +213,24 @@ export default function LoginPage() {
             >
               {busy ? 'Signing you in…' : 'Log in'}
             </button>
+
+            {error ? (
+              <p style={{ marginTop: 10, fontSize: 13, color: '#991b1b' }}>{error}</p>
+            ) : null}
+            {info ? (
+              <p style={{ marginTop: 10, fontSize: 13, color: '#065f46' }}>{info}</p>
+            ) : null}
+            {verificationBlocked ? (
+              <button
+                type="button"
+                className="rhq-btn-secondary"
+                onClick={handleResendVerification}
+                disabled={resending}
+                style={{ marginTop: 8, width: '100%', padding: '0.7rem 1rem' }}
+              >
+                {resending ? 'Sending verification…' : 'Resend verification email'}
+              </button>
+            ) : null}
 
             <p
               style={{

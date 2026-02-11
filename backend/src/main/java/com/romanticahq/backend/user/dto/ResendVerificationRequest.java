@@ -1,7 +1,12 @@
 package com.romanticahq.backend.user.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class ResendVerificationRequest {
 
+    @Email
+    @NotBlank
     private String email;
 
     public ResendVerificationRequest() {

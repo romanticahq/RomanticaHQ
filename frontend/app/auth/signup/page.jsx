@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
 export default function SignupPage() {
   const [form, setForm] = useState({
     fullName: '',
@@ -35,18 +33,26 @@ export default function SignupPage() {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/register`, {
+      const res = await fetch(`/api/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Signup failed');
+        let msg = 'Signup failed';
+        try {
+          const json = await res.json();
+          msg = json?.error || json?.message || msg;
+        } catch {
+          const text = await res.text();
+          msg = text || msg;
+        }
+        throw new Error(msg);
       }
 
-      alert('Account created! You can now log in.');
+      const data = await res.json().catch(() => null);
+      alert(data?.message || 'Account created! Please check your email to verify your account.');
       window.location.href = '/auth/login';
     } catch (err) {
       alert(`Error: ${err.message}`);
@@ -57,15 +63,13 @@ export default function SignupPage() {
 
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(236,72,153,0.16), transparent 55%), #020617',
       }}
     >
       <div
@@ -117,9 +121,9 @@ export default function SignupPage() {
               fontSize: 13,
             }}
           >
-            <li>💗 Free to join. No payment required to start.</li>
-            <li>🛡️ You stay in control of your data and privacy.</li>
-            <li>🚫 Zero tolerance for harassment or abuse.</li>
+            <li>Free to join. No payment required to start.</li>
+            <li>You stay in control of your data and privacy.</li>
+            <li>Zero tolerance for harassment or abuse.</li>
           </ul>
         </section>
 

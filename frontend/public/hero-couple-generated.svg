@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200" fill="none">
+  <defs>
+    <!-- Brand palette -->
+    <linearGradient id="brand" x1="260" y1="160" x2="1540" y2="1060" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316"/>
+      <stop offset="0.46" stop-color="#DB2777"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+
+    <!-- Soft monochrome wash to keep text readable -->
+    <linearGradient id="wash" x1="0" y1="0" x2="0" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#020617" stop-opacity="0.88"/>
+      <stop offset="0.55" stop-color="#020617" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#020617" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- "Photo-ish" lighting -->
+    <radialGradient id="spot" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(1220 620) rotate(90) scale(620 860)">
+      <stop stop-color="#FFFFFF" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="bokehA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(1380 300) rotate(90) scale(260 360)">
+      <stop stop-color="#FDE68A" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FDE68A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bokehB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(1580 760) rotate(90) scale(320 420)">
+      <stop stop-color="#A5B4FC" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#A5B4FC" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Blur helpers -->
+    <filter id="blur6" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="blur18" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="blur40" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+
+    <!-- Grain -->
+    <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.08 0" result="a"/>
+      <feComposite in="a" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <!-- Base -->
+  <rect x="0" y="0" width="1800" height="1200" fill="#020617"/>
+
+  <!-- Soft "photo light" -->
+  <ellipse cx="1220" cy="620" rx="840" ry="620" fill="url(#spot)"/>
+
+  <!-- Bokeh -->
+  <circle cx="1380" cy="300" r="260" fill="url(#bokehA)" filter="url(#blur40)"/>
+  <circle cx="1580" cy="760" r="320" fill="url(#bokehB)" filter="url(#blur40)"/>
+
+  <!-- Abstract, photo-like "hands reaching" shapes (original vector art, not a photo).
+       This reads as real-people romance without being a literal identifiable person. -->
+  <g opacity="0.70">
+    <!-- Left hand -->
+    <path
+      d="M980 840c-210-90-330-186-380-288-32-65-26-124 18-170 54-56 150-62 256-12 92 43 170 120 224 216 36 65 52 136 50 210-2 68-36 84-168 44z"
+      fill="url(#brand)"
+      opacity="0.55"
+      filter="url(#blur18)"
+    />
+    <path
+      d="M1036 828c-164-74-262-146-304-216-28-46-22-88 14-122 44-42 122-42 206-4 72 33 134 90 178 162 30 49 44 102 42 158-2 50-30 64-136 22z"
+      fill="#F8FAFC"
+      opacity="0.10"
+      filter="url(#blur18)"
+    />
+
+    <!-- Right hand -->
+    <path
+      d="M1390 930c180-112 288-232 324-360 22-76 0-136-62-170-74-41-180-22-268 56-76 68-132 164-156 270-16 72-14 146 6 216 18 64 52 62 156-12z"
+      fill="url(#brand)"
+      opacity="0.50"
+      filter="url(#blur18)"
+    />
+    <path
+      d="M1354 906c136-86 216-176 242-270 18-56 2-100-44-124-56-30-134-14-198 44-58 52-98 126-116 206-12 54-10 110 6 162 14 48 40 48 110-18z"
+      fill="#F8FAFC"
+      opacity="0.10"
+      filter="url(#blur18)"
+    />
+  </g>
+
+  <!-- A subtle heart glow where hands meet -->
+  <g opacity="0.55" filter="url(#blur6)">
+    <path
+      d="M1204 740c26-36 66-36 92-12 28 26 30 72 0 104-24 26-64 56-92 74-28-18-68-48-92-74-30-32-28-78 0-104 26-24 66-24 92 12z"
+      fill="url(#brand)"
+    />
+  </g>
+
+  <!-- Wash overlay keeps content readable on top -->
+  <rect x="0" y="0" width="1800" height="1200" fill="url(#wash)"/>
+
+  <!-- Grain overlay for "photo" feel -->
+  <rect x="0" y="0" width="1800" height="1200" fill="transparent" filter="url(#grain)"/>
+</svg>
+

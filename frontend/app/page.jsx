@@ -1,11 +1,9 @@
 export default function HomePage() {
   return (
     <main
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, rgba(251,113,133,0.16), transparent 55%), radial-gradient(circle at bottom, rgba(129,140,248,0.16), transparent 55%), #020617",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -25,19 +23,8 @@ export default function HomePage() {
         }}
       >
         {/* LEFT SIDE – HERO */}
-        <section>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "0.2rem 0.75rem",
-              borderRadius: 999,
-              backgroundColor: "rgba(15,23,42,0.85)",
-              border: "1px solid rgba(148,163,184,0.4)",
-              marginBottom: 16,
-            }}
-          >
+        <section className="rhq-stagger">
+          <div className="rhq-eyebrow rhq-reveal" style={{ "--i": 0 }}>
             <span
               style={{
                 width: 8,
@@ -46,32 +33,20 @@ export default function HomePage() {
                 background: "radial-gradient(circle, #22c55e, #16a34a)",
               }}
             />
-            <span style={{ fontSize: 12, color: "#e5e7eb" }}>
-              Built for serious energy · Not for time wasters
-            </span>
+            <span>Built for serious energy. Not for time wasters.</span>
           </div>
 
           <h1
-            className="rhq-title-xl"
-            style={{
-              fontSize: 40,
-              lineHeight: 1.1,
-              marginBottom: 16,
-              color: "white",
-            }}
+            className="rhq-h1 rhq-reveal"
+            style={{ "--i": 1 }}
           >
             Dating that feels{" "}
             <span style={{ color: "#f97316" }}>soft, safe,</span> and real.
           </h1>
 
           <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.6,
-              color: "#d1d5db",
-              maxWidth: 540,
-              marginBottom: 24,
-            }}
+            className="rhq-lede rhq-reveal"
+            style={{ "--i": 2 }}
           >
             RomanticaHQ is for people who are done with games. No swiping
             addiction. No fake flexing. Just real humans who want intentional
@@ -79,64 +54,40 @@ export default function HomePage() {
           </p>
 
           <div
+            className="rhq-reveal"
             style={{
               display: "flex",
               flexWrap: "wrap",
               gap: 12,
               marginBottom: 16,
+              "--i": 3,
             }}
           >
-            <a
-              href="/auth/signup"
-              style={{
-                padding: "0.85rem 1.75rem",
-                borderRadius: 999,
-                background:
-                  "linear-gradient(135deg, #f97316, #db2777, #6366f1)",
-                color: "white",
-                fontWeight: 600,
-                fontSize: 15,
-                textDecoration: "none",
-                boxShadow: "0 20px 40px rgba(15,23,42,0.45)",
-              }}
-            >
-              💗 Start meeting real people today
+            <a href="/auth/signup" className="rhq-btn-primary">
+              Start meeting real people
             </a>
-            <a
-              href="/auth/login"
-              style={{
-                padding: "0.85rem 1.4rem",
-                borderRadius: 999,
-                border: "1px solid rgba(148,163,184,0.7)",
-                color: "#e5e7eb",
-                fontWeight: 500,
-                fontSize: 14,
-                textDecoration: "none",
-                backgroundColor: "rgba(15,23,42,0.8)",
-              }}
-            >
+            <a href="/auth/login" className="rhq-btn-secondary">
               I already have an account
             </a>
           </div>
 
           <p
-            style={{
-              fontSize: 12,
-              color: "#9ca3af",
-              maxWidth: 480,
-            }}
+            className="rhq-reveal"
+            style={{ fontSize: 12, color: "#9ca3af", maxWidth: 480, "--i": 4 }}
           >
             By joining, you confirm you&apos;re 18+ and you agree to our Terms,
             Privacy Policy, and Safety Guidelines.
           </p>
 
           <div
+            className="rhq-reveal"
             style={{
               marginTop: 28,
               display: "grid",
               gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
               gap: 16,
               maxWidth: 560,
+              "--i": 5,
             }}
           >
             <div
@@ -189,8 +140,12 @@ export default function HomePage() {
               height: 520,
               borderRadius: 24,
               padding: "1.8rem 1.9rem",
-              background:
-                "radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 55%), radial-gradient(circle at bottom right, rgba(168,85,247,0.18), transparent 55%), rgba(15,23,42,0.96)",
+              backgroundColor: "rgba(15,23,42,0.96)",
+              backgroundImage:
+                "radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 55%), radial-gradient(circle at bottom right, rgba(168,85,247,0.18), transparent 55%), url('/romance-cta.svg')",
+              backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+              backgroundPosition: "top left, bottom right, center 110%",
+              backgroundSize: "auto, auto, 740px auto",
               boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
               display: "flex",
               flexDirection: "column",
@@ -209,7 +164,7 @@ export default function HomePage() {
                   marginBottom: 10,
                 }}
               >
-                “Two real people. No games. Just soft, intentional energy.”
+                “Two real people. No games. Just calm, intentional energy.”
               </p>
               <p
                 style={{
@@ -245,7 +200,7 @@ export default function HomePage() {
                   alignSelf: "flex-start",
                 }}
               >
-                <span>✨</span>
+                <span style={{ width: 6, height: 6, borderRadius: 999, background: "#fca5a5" }} />
                 <span>Soft, calm, grown energy.</span>
               </div>
               <div
@@ -260,74 +215,36 @@ export default function HomePage() {
                   alignSelf: "flex-start",
                 }}
               >
-                <span>🎯</span>
+                <span style={{ width: 6, height: 6, borderRadius: 999, background: "#a5b4fc" }} />
                 <span>Matches based on values, not vibes.</span>
               </div>
             </div>
 
-            {/* AVATARS – LENKA & JOHN */}
+            {/* ROMANTIC CTA (no "avatar" circles) */}
             <div
               style={{
                 marginBottom: 18,
-                display: "flex",
-                flexDirection: "column",
-                gap: 16,
+                padding: "0.95rem 1rem",
+                borderRadius: 18,
+                border: "1px solid rgba(148,163,184,0.35)",
+                backgroundColor: "rgba(2,6,23,0.35)",
+                backdropFilter: "blur(6px)",
               }}
             >
-              {/* Lenka */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div
-                  style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(circle at 30% 20%, #38bdf8, #0f172a)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 18,
-                    fontWeight: 600,
-                    border: "2px solid rgba(248,250,252,0.9)",
-                    flexShrink: 0,
-                  }}
-                >
-                  L
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>Lenka, 26</div>
-                  <div style={{ fontSize: 12, opacity: 0.9 }}>
-                    “Looking for soft, grown energy.”
-                  </div>
-                </div>
+              <div style={{ fontSize: 13, fontWeight: 650, marginBottom: 6 }}>
+                Your next chapter can start here.
               </div>
-
-              {/* John */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div
-                  style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(circle at 30% 20%, #a855f7, #0f172a)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 18,
-                    fontWeight: 600,
-                    border: "2px solid rgba(248,250,252,0.9)",
-                    flexShrink: 0,
-                  }}
-                >
-                  J
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>John, 28</div>
-                  <div style={{ fontSize: 12, opacity: 0.9 }}>
-                    “Ready for intentional, serious connection.”
-                  </div>
-                </div>
+              <div style={{ fontSize: 12, color: "#cbd5e1", lineHeight: 1.5 }}>
+                Build a real profile, match intentionally, and talk with people
+                who are actually ready.
+              </div>
+              <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <a href="/auth/signup" className="rhq-btn-primary" style={{ padding: "0.7rem 1.1rem", fontSize: 13 }}>
+                  Create your profile
+                </a>
+                <a href="/terms" className="rhq-btn-secondary" style={{ padding: "0.7rem 1.1rem", fontSize: 13 }}>
+                  See how it works
+                </a>
               </div>
             </div>
 
@@ -342,54 +259,29 @@ export default function HomePage() {
                 color: "#e2e8f0",
               }}
             >
-              <span>💬</span>
-              <span>RomanticaHQ matched them based on shared values.</span>
+              <span style={{ width: 6, height: 6, borderRadius: 999, background: "#34d399" }} />
+              <span>RomanticaHQ helps you match based on shared values.</span>
             </div>
           </div>
         </section>
       </div>
 
       {/* HOW ROMANTICAHQ WORKS */}
-      <section
-        style={{
-          marginTop: "3.5rem",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1040,
-            width: "100%",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 20,
-              color: "#e5e7eb",
-              marginBottom: 18,
-            }}
-          >
+      <section className="rhq-section">
+        <div className="rhq-container">
+          <h2 className="rhq-h2 rhq-reveal" style={{ "--rhq-delay": "120ms" }}>
             How RomanticaHQ works
           </h2>
 
           <div
+            className="rhq-grid rhq-grid-3 rhq-reveal"
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
               gap: 20,
+              "--rhq-delay": "200ms",
             }}
           >
             {/* Step 1 */}
-            <div
-              style={{
-                padding: "1.25rem 1.2rem",
-                borderRadius: 16,
-                backgroundColor: "rgba(15,23,42,0.9)",
-                border: "1px solid rgba(148,163,184,0.4)",
-              }}
-            >
+            <div className="rhq-card rhq-card-pad">
               <div
                 style={{
                   fontSize: 12,
@@ -421,14 +313,7 @@ export default function HomePage() {
             </div>
 
             {/* Step 2 */}
-            <div
-              style={{
-                padding: "1.25rem 1.2rem",
-                borderRadius: 16,
-                backgroundColor: "rgba(15,23,42,0.9)",
-                border: "1px solid rgba(148,163,184,0.4)",
-              }}
-            >
+            <div className="rhq-card rhq-card-pad">
               <div
                 style={{
                   fontSize: 12,
@@ -460,14 +345,7 @@ export default function HomePage() {
             </div>
 
             {/* Step 3 */}
-            <div
-              style={{
-                padding: "1.25rem 1.2rem",
-                borderRadius: 16,
-                backgroundColor: "rgba(15,23,42,0.9)",
-                border: "1px solid rgba(148,163,184,0.4)",
-              }}
-            >
+            <div className="rhq-card rhq-card-pad">
               <div
                 style={{
                   fontSize: 12,
@@ -496,6 +374,97 @@ export default function HomePage() {
                 We focus on shared values, not just looks. Fewer but better
                 matches, for people who actually know what they want.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCT SECTIONS */}
+      <section className="rhq-section">
+        <div className="rhq-container">
+          <h2 className="rhq-h2 rhq-reveal" style={{ "--rhq-delay": "120ms" }}>
+            Built for profiles, matching, chat, and AI guidance
+          </h2>
+          <p className="rhq-lede rhq-reveal" style={{ "--rhq-delay": "180ms" }}>
+            We are building a complete experience: a real profile, intentional matching,
+            safe messaging, and optional AI support that helps you communicate better.
+          </p>
+
+          <div className="rhq-grid rhq-grid-4 rhq-reveal" style={{ "--rhq-delay": "260ms" }}>
+            <div className="rhq-card rhq-card-pad">
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>Profiles</div>
+              <div style={{ fontSize: 16, color: "#f8fafc", fontWeight: 650, marginBottom: 6 }}>
+                Photo-forward, honest bios
+              </div>
+              <div style={{ fontSize: 13, color: "#d1d5db", lineHeight: 1.6 }}>
+                Build a profile that shows who you are, what you want, and what you will not tolerate.
+              </div>
+            </div>
+
+            <div className="rhq-card rhq-card-pad">
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>Matching</div>
+              <div style={{ fontSize: 16, color: "#f8fafc", fontWeight: 650, marginBottom: 6 }}>
+                Values-first recommendations
+              </div>
+              <div style={{ fontSize: 13, color: "#d1d5db", lineHeight: 1.6 }}>
+                Less chaos, fewer bad fits. The goal is quality matches you actually want to talk to.
+              </div>
+            </div>
+
+            <div className="rhq-card rhq-card-pad">
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>Chat</div>
+              <div style={{ fontSize: 16, color: "#f8fafc", fontWeight: 650, marginBottom: 6 }}>
+                Safer conversations
+              </div>
+              <div style={{ fontSize: 13, color: "#d1d5db", lineHeight: 1.6 }}>
+                Built-in controls: block, report, and clear boundaries. Calm design encourages respect.
+              </div>
+            </div>
+
+            <div className="rhq-card rhq-card-pad">
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 8 }}>AI Matching</div>
+              <div style={{ fontSize: 16, color: "#f8fafc", fontWeight: 650, marginBottom: 6 }}>
+                Optional guidance, not manipulation
+              </div>
+              <div style={{ fontSize: 13, color: "#d1d5db", lineHeight: 1.6 }}>
+                AI can help with prompts, first messages, and clarity. You stay in control.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA BAND */}
+      <section className="rhq-section">
+        <div
+          className="rhq-container rhq-card rhq-reveal"
+          style={{
+            "--rhq-delay": "120ms",
+            padding: "1.5rem 1.4rem",
+            backgroundImage:
+              "radial-gradient(circle at top left, rgba(251,113,133,0.18), transparent 55%), radial-gradient(circle at bottom right, rgba(129,140,248,0.18), transparent 55%), url('/romance-cta.svg')",
+            backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+            backgroundPosition: "top left, bottom right, right -220px center",
+            backgroundSize: "auto, auto, 880px auto",
+          }}
+        >
+          <div className="rhq-cta-grid">
+            <div>
+              <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 6 }}>Join for free</div>
+              <div style={{ fontFamily: "var(--rhq-font-serif)", fontSize: 22, color: "#f8fafc", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: 8 }}>
+                Start with a real profile. Let matching do the work.
+              </div>
+              <div style={{ fontSize: 13, color: "#d1d5db", lineHeight: 1.6, maxWidth: 60 * 8 }}>
+                We are building RomanticaHQ as a serious platform. Calm UI, intentional matches, safer chat.
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, flexWrap: "wrap" }}>
+              <a href="/auth/signup" className="rhq-btn-primary">
+                Create account
+              </a>
+              <a href="/auth/login" className="rhq-btn-secondary">
+                Log in
+              </a>
             </div>
           </div>
         </div>

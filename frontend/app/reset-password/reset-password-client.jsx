@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-
 export default function ResetPasswordClient({ token }) {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -17,18 +15,26 @@ export default function ResetPasswordClient({ token }) {
     try {
       if (!token) throw new Error('Missing reset token.');
 
-      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+      const res = await fetch(`/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password }),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Reset failed');
+        let msg = 'Reset failed';
+        try {
+          const json = await res.json();
+          msg = json?.error || json?.message || msg;
+        } catch {
+          const text = await res.text();
+          msg = text || msg;
+        }
+        throw new Error(msg);
       }
 
-      setMessage('Password updated. You can now log in.');
+      const data = await res.json().catch(() => null);
+      setMessage(data?.message || 'Password updated. You can now log in.');
     } catch (err) {
       setMessage(`Error: ${err.message}`);
     } finally {
@@ -38,15 +44,13 @@ export default function ResetPasswordClient({ token }) {
 
   return (
     <div
-      className="rhq-fullscreen rhq-main-pad"
+      className="rhq-fullscreen rhq-main-pad rhq-romance-bg"
       style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2.5rem 1.5rem',
-        background:
-          'radial-gradient(circle at top, rgba(129,140,248,0.16), transparent 55%), #020617',
       }}
     >
       <div style={{ width: '100%', maxWidth: 560 }}>
@@ -88,14 +92,10 @@ export default function ResetPasswordClient({ token }) {
           <button
             type="submit"
             disabled={busy}
+            className="rhq-btn-primary"
             style={{
               width: '100%',
               padding: '0.8rem 1rem',
-              borderRadius: 999,
-              border: 'none',
-              background: 'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-              color: 'white',
-              fontWeight: 600,
               fontSize: 14,
               cursor: busy ? 'default' : 'pointer',
               opacity: busy ? 0.8 : 1,
@@ -141,4 +141,3 @@ const fieldStyle = {
   fontSize: 13,
   outline: 'none',
 };
-

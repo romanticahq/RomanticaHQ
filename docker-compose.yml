@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
@@ -24,6 +22,11 @@ services:
       SPRING_DATASOURCE_USERNAME: romantica
       SPRING_DATASOURCE_PASSWORD: romantica_pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: "dev-secret-change-me-to-something-longer-32chars"
+      JWT_EXPIRY_SECONDS: 604800
+      JWT_COOKIE_NAME: RHQ_AUTH
+      JWT_COOKIE_SECURE: "false"
+      CORS_ALLOWED_ORIGINS: "http://localhost,http://localhost:3000,https://romanticahq.com"
     ports:
       - "8080:8080"
     networks:
@@ -36,9 +39,22 @@ services:
     depends_on:
       - backend
     environment:
-      NEXT_PUBLIC_API_BASE_URL: "https://romanticahq.com"
+      API_PROXY_TARGET: "http://backend:8080"
     ports:
       - "3000:3000"
+    networks:
+      - romantica_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: romanticahq_nginx
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
     networks:
       - romantica_net
 

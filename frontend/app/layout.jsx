@@ -8,15 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          fontFamily:
-            'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
-          backgroundColor: '#0b1120',
-          color: '#020617',
-        }}
-      >
+      <body>
         <div
           style={{
             minHeight: '100vh',
@@ -108,16 +100,8 @@ export default function RootLayout({ children }) {
 
                 <a
                   href="/auth/signup"
-                  style={{
-                    padding: '0.45rem 0.95rem',
-                    borderRadius: 999,
-                    background:
-                      'linear-gradient(135deg, #f97316, #db2777, #6366f1)',
-                    color: 'white',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                  }}
+                  className="rhq-btn-primary"
+                  style={{ padding: '0.55rem 1rem', fontSize: 14 }}
                 >
                   Join for free
                 </a>

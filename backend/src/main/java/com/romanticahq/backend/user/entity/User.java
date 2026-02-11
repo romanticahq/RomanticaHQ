@@ -38,6 +38,22 @@ public class User {
     @Column
     private Instant verificationTokenExpiry;
 
+    // ========= PASSWORD RESET =========
+
+    @Column
+    private String passwordResetToken;
+
+    @Column
+    private Instant passwordResetTokenExpiry;
+
+    // ========= LOGIN PROTECTION =========
+
+    @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    @Column
+    private Instant loginLockedUntil;
+
     public User() {}
 
     // ===== GETTERS & SETTERS =====
@@ -68,4 +84,16 @@ public class User {
 
     public Instant getVerificationTokenExpiry() { return verificationTokenExpiry; }
     public void setVerificationTokenExpiry(Instant verificationTokenExpiry) { this.verificationTokenExpiry = verificationTokenExpiry; }
+
+    public String getPasswordResetToken() { return passwordResetToken; }
+    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
+
+    public Instant getPasswordResetTokenExpiry() { return passwordResetTokenExpiry; }
+    public void setPasswordResetTokenExpiry(Instant passwordResetTokenExpiry) { this.passwordResetTokenExpiry = passwordResetTokenExpiry; }
+
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+
+    public Instant getLoginLockedUntil() { return loginLockedUntil; }
+    public void setLoginLockedUntil(Instant loginLockedUntil) { this.loginLockedUntil = loginLockedUntil; }
 }
