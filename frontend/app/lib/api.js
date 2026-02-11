@@ -1,3 +1,5 @@
+import { clearAuth } from './auth';
+
 export async function apiFetch(path, options = {}) {
   const headers = new Headers(options.headers || {});
   if (!headers.has('Content-Type') && options.body) {
@@ -18,6 +20,14 @@ export async function apiFetch(path, options = {}) {
     }
     const err = new Error(msg);
     err.status = res.status;
+
+    if (res.status === 401 && typeof window !== 'undefined') {
+      clearAuth();
+      if (!window.location.pathname.startsWith('/auth/')) {
+        window.location.href = '/auth/login';
+      }
+    }
+
     throw err;
   }
 
